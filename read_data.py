@@ -3,7 +3,6 @@ import os
 import glob
 import pandas as pd
 from tqdm import tqdm
-from openpyxl.workbook import Workbook
 
 FILE = 'm107.off'
 FILE2 = 'car_wheel_cap.ply'
@@ -54,7 +53,7 @@ def save_ouput(fold):
             mesh = trimesh.load(filename, force='mesh')
             new_dict = {"shape_class": str(dir), "num_verticles": int(num_vert), "num_faces": int(num_faces),
                         "faces_type": str(type_of_faces), "axis_bound_box": mesh.bounding_box,
-                        "bound_box": mesh.bounding_box_oriented}
+                        "bound_box": mesh.bounding_box_oriented, "path": filename}
             output.append(new_dict)
             i += 1
     print(f"Number of 3D objects in dataset: {i}")
@@ -67,8 +66,8 @@ def save_excel(folder):
     df.to_excel('filter.xlsx')
 
 
-save_excel(DIR)
-
+# # uncomment the line below to save the excel file
+# save_excel(DIR)
 
 # print(output)
 # view_3d(FILE)
