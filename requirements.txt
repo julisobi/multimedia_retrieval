@@ -3,3 +3,6 @@ scipy
 numpy
 pyglet
 tqdm
+matplotlib
+openpyxl
+pandas
