@@ -51,8 +51,28 @@ def save_ouput(fold):
                 faces_nums.append(int(num_faces))
 
             mesh = trimesh.load(filename, force='mesh')
+
+            # Normalization of position
+            translate_matrix = [[1, 0, 0, -mesh.center_mass[0]],
+                                [0, 1, 0, -mesh.center_mass[1]],
+                                [0, 0, 1, -mesh.center_mass[2]],
+                                [0, 0, 0, 1]]
+            mesh.apply_transform(translate_matrix)
+
+            # Normalization scale
+            bound_box = mesh.bounding_box
+            smallest = max(bound_box.extents)
+            scale = 1 / smallest
+
+            scale_matrix = [[scale, 0, 0, 0],
+                            [0, scale, 0, 0],
+                            [0, 0, scale, 0],
+                            [0, 0, 0, scale]]
+
+            mesh.apply_transform(scale_matrix)
+
             new_dict = {"shape_class": str(dir), "num_verticles": int(num_vert), "num_faces": int(num_faces),
-                        "faces_type": str(type_of_faces), "axis_bound_box": mesh.bounding_box,
+                        "faces_type": str(type_of_faces), "axis_bound_box": bound_box,
                         "bound_box": mesh.bounding_box_oriented, "path": filename}
             output.append(new_dict)
             i += 1
@@ -67,7 +87,4 @@ def save_excel(folder):
 
 
 # # uncomment the line below to save the excel file
-# save_excel(DIR)
-
-# print(output)
-# view_3d(FILE)
+save_excel(DIR)
