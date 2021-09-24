@@ -73,7 +73,8 @@ def save_ouput(fold):
 
             new_dict = {"shape_class": str(dir), "num_verticles": int(num_vert), "num_faces": int(num_faces),
                         "faces_type": str(type_of_faces), "axis_bound_box": bound_box,
-                        "bound_box": mesh.bounding_box_oriented, "path": filename}
+                        "bound_box": mesh.bounding_box_oriented, "path": filename, "watertight": mesh.is_watertight,
+                        "area": mesh.area, "volume": mesh.volume}
             output.append(new_dict)
             i += 1
     print(f"Number of 3D objects in dataset: {i}")
