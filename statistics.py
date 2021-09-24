@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
-from numpy import mean
+from numpy import mean, quantile
 from read_data import view_3d
 
 excel_file = "filter.xlsx"
@@ -115,6 +115,29 @@ def show_outlier_shape(file):
         view_3d(paths[v_index])
 
 
+def find_outliers(file):
+    vertices, categories, faces = get_list_from_excel(file)
+    data = pd.read_excel(file)
+    paths = list(data['path'])
+    outliers = []
+    for i in range(len(vertices)):
+        if vertices[i] < 100 or faces[i] < 100:
+            outliers.append(paths[i])
+    print(outliers)
+
+
+def get_statistics(file):
+    vertices, categories, faces = get_list_from_excel(file)
+    mean_vert, mean_faces = average_values(file)
+    print(f"Mean faces: {mean_faces}, Mean vertices: {mean_vert}")
+    print(f"Q1 faces: {quantile(faces, .25)}, Q1 vertices: {quantile(vertices, .25)}")
+    print(f"Q2 faces: {quantile(faces, .5)}, Q2 vertices: {quantile(vertices, .5)}")
+    print(f"Q3 faces: {quantile(faces, .75)}, Q3 vertices: {quantile(vertices, .75)}")
+    print(f"Min value faces: {min(faces)}, Min value vertices: {min(vertices)}")
+    print(f"Max value faces: {max(faces)}, Max value vertices: {max(vertices)}")
+
 # show_average_shape(excel_file)
 # show_outlier_shape(excel_file)
 # show_plots(excel_file)
+# find_outliers(excel_file)
+get_statistics(excel_file)
