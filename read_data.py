@@ -5,7 +5,7 @@ import pandas as pd
 from tqdm import tqdm
 
 FILE = 'm107.off'
-FILE2 = 'car_wheel_cap.ply'
+FILE2 = 'lobster.ply'
 DIR = 'LabeledDB_new'
 trimesh.util.attach_to_log()
 
@@ -88,4 +88,4 @@ def save_excel(folder):
 
 
 # # uncomment the line below to save the excel file
-save_excel(DIR)
+# save_excel(DIR)
