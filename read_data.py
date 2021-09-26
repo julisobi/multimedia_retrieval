@@ -15,6 +15,30 @@ def view_3d(file):
     mesh.show()
 
 
+def normalization_tool(file):
+    mesh = trimesh.load(file, force='mesh')
+
+    # Normalization of position
+    translate_matrix = [[1, 0, 0, -mesh.center_mass[0]],
+                        [0, 1, 0, -mesh.center_mass[1]],
+                        [0, 0, 1, -mesh.center_mass[2]],
+                        [0, 0, 0, 1]]
+    mesh.apply_transform(translate_matrix)
+
+    # Normalization scale
+    bound_box = mesh.bounding_box
+    smallest = max(bound_box.extents)
+    scale = 1 / smallest
+
+    scale_matrix = [[scale, 0, 0, 0],
+                    [0, scale, 0, 0],
+                    [0, 0, scale, 0],
+                    [0, 0, 0, scale]]
+
+    mesh.apply_transform(scale_matrix)
+    return mesh
+
+
 def save_ouput(fold):
     output = []
     i = 0
@@ -50,31 +74,13 @@ def save_ouput(fold):
                 category_nums.append(str(dir))
                 faces_nums.append(int(num_faces))
 
-            mesh = trimesh.load(filename, force='mesh')
-
-            # Normalization of position
-            translate_matrix = [[1, 0, 0, -mesh.center_mass[0]],
-                                [0, 1, 0, -mesh.center_mass[1]],
-                                [0, 0, 1, -mesh.center_mass[2]],
-                                [0, 0, 0, 1]]
-            mesh.apply_transform(translate_matrix)
-
-            # Normalization scale
-            bound_box = mesh.bounding_box
-            smallest = max(bound_box.extents)
-            scale = 1 / smallest
-
-            scale_matrix = [[scale, 0, 0, 0],
-                            [0, scale, 0, 0],
-                            [0, 0, scale, 0],
-                            [0, 0, 0, scale]]
-
-            mesh.apply_transform(scale_matrix)
-
+            mesh = normalization_tool(filename)
             new_dict = {"shape_class": str(dir), "num_verticles": int(num_vert), "num_faces": int(num_faces),
-                        "faces_type": str(type_of_faces), "axis_bound_box": bound_box,
-                        "bound_box": mesh.bounding_box_oriented, "path": filename, "watertight": mesh.is_watertight,
-                        "area": mesh.area, "volume": mesh.volume}
+                        "faces_type": str(type_of_faces), "axis_bound_box": mesh.bounding_box.extents,
+                        "bound_box": mesh.bounding_box_oriented.extents, "path": filename,
+                        "watertight": mesh.is_watertight, "area": mesh.area,
+                        "volume": mesh.volume, "compactness": mesh.volume / mesh.bounding_sphere.volume,
+                        "bound_box_volume": mesh.bounding_box_oriented.volume}
             output.append(new_dict)
             i += 1
     print(f"Number of 3D objects in dataset: {i}")

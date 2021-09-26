@@ -140,4 +140,4 @@ def get_statistics(file):
 # show_outlier_shape(excel_file)
 # show_plots(excel_file)
 # find_outliers(excel_file)
-get_statistics(excel_file)
+# get_statistics(excel_file)
