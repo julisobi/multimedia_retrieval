@@ -2,6 +2,7 @@ import numpy as np
 import random
 import math
 import trimesh
+import matplotlib.pyplot as plt
 
 FILE = "m107.off"
 trimesh.util.attach_to_log()
@@ -17,7 +18,6 @@ def save_points(file):
             else:
                 break
     return points
-
 
 
 def distance(p1, p2):
@@ -47,7 +47,6 @@ def d1(file):
     points = save_points(file)
     random_p = random.choice(points)
     dist = distance(center, random_p)
-    print(dist)
     return dist
 
 
@@ -89,4 +88,78 @@ def d4(file):
     return cr
 
 
-d1(FILE)
+def save_values_a1(file, num_points):
+    a1_val = []
+    for i in range(num_points):
+        new_val = a1(file)
+        print(new_val)
+        a1_val.append(new_val)
+    return a1_val
+
+
+def save_values_d1(file, num_points):
+    d1_val = []
+    for i in range(num_points):
+        d1_val.append(d1(file))
+    return d1_val
+
+
+def save_values_d2(file, num_points):
+    d2_val = []
+    for i in range(num_points):
+        d2_val.append(d2(file))
+    return d2_val
+
+
+def save_values_d3(file, num_points):
+    d3_val = []
+    for i in range(num_points):
+        d3_val.append(d3(file))
+    return d3_val
+
+
+def save_values_d4(file, num_points):
+    d4_val = []
+    for i in range(num_points):
+        d4_val.append(d4(file))
+    return d4_val
+
+
+def histograms(file, num_points):
+    # a1 = save_values_a1(file, num_points)
+    d1, d2, d3, d4 = save_values_d1(file, num_points), save_values_d2(file, num_points), \
+                     save_values_d3(file, num_points), save_values_d4(file, num_points)
+
+    # plt.hist(a1, rwidth=0.95)
+    # plt.title('Distribution of a1 values')
+    # plt.ylabel('frequency')
+    # plt.xlabel('value')
+    # plt.show()
+
+    plt.hist(d1, rwidth=0.95)
+    plt.xticks(rotation=90)
+    plt.title('Distribution of d1 values')
+    plt.ylabel('frequency')
+    plt.xlabel('value')
+    plt.show()
+
+    plt.hist(d2, rwidth=0.95)
+    plt.title('Distribution of d2 values')
+    plt.ylabel('frequency')
+    plt.xlabel('value')
+    plt.show()
+
+    plt.hist(d3, rwidth=0.95)
+    plt.title('Distribution of d3 values')
+    plt.ylabel('frequency')
+    plt.xlabel('value')
+    plt.show()
+
+    plt.hist(d4, rwidth=0.95)
+    plt.title('Distribution of d4 values')
+    plt.ylabel('frequency')
+    plt.xlabel('value')
+    plt.show()
+
+
+histograms(FILE, 100)
