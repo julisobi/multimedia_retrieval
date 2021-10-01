@@ -1,6 +1,5 @@
 import numpy as np
 import random
-import math
 import trimesh
 import matplotlib.pyplot as plt
 
@@ -26,19 +25,16 @@ def distance(p1, p2):
     return dist
 
 
-def a1(file):
+def a3(file):
     points = save_points(file)
     random_p1 = np.array(random.choice(points))
     random_p2 = np.array(random.choice(points))
     random_p3 = np.array(random.choice(points))
-    x1, y1, z1 = random_p1[0], random_p1[1], random_p1[2]
-    x2, y2, z2 = random_p2[0], random_p2[1], random_p2[2]
-    x3, y3, z3 = random_p3[0], random_p3[1], random_p3[2]
-    num = (x2 - x1) * (x3 - x1) + (y2 - y1) * (y3 - y2) + (z2 - z1) * (z3 - z1)
-    den = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2 + (z2 - z1) ** 2) * \
-          math.sqrt((x3 - x1) ** 2 + (y3 - y1) ** 2 + (z3 - z1) ** 2)
-    angle = math.degrees(math.acos(num / den))
-    return angle
+    ba = random_p1 - random_p2
+    bc = random_p3 - random_p2
+    cosine_angle = np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc))
+    angle = np.arccos(cosine_angle)
+    return np.degrees(angle)
 
 
 def d1(file):
@@ -88,13 +84,12 @@ def d4(file):
     return cr
 
 
-def save_values_a1(file, num_points):
-    a1_val = []
+def save_values_a3(file, num_points):
+    a3_val = []
     for i in range(num_points):
-        new_val = a1(file)
-        print(new_val)
-        a1_val.append(new_val)
-    return a1_val
+        new_val = a3(file)
+        a3_val.append(new_val)
+    return a3_val
 
 
 def save_values_d1(file, num_points):
@@ -126,18 +121,17 @@ def save_values_d4(file, num_points):
 
 
 def histograms(file, num_points):
-    # a1 = save_values_a1(file, num_points)
-    d1, d2, d3, d4 = save_values_d1(file, num_points), save_values_d2(file, num_points), \
-                     save_values_d3(file, num_points), save_values_d4(file, num_points)
+    a3, d1, d2, d3, d4 = save_values_a3(file, num_points), save_values_d1(file, num_points), \
+                         save_values_d2(file, num_points), save_values_d3(file, num_points), \
+                         save_values_d4(file, num_points)
 
-    # plt.hist(a1, rwidth=0.95)
-    # plt.title('Distribution of a1 values')
-    # plt.ylabel('frequency')
-    # plt.xlabel('value')
-    # plt.show()
+    plt.hist(a3, rwidth=0.95)
+    plt.title('Distribution of a3 values')
+    plt.ylabel('frequency')
+    plt.xlabel('value')
+    plt.show()
 
     plt.hist(d1, rwidth=0.95)
-    plt.xticks(rotation=90)
     plt.title('Distribution of d1 values')
     plt.ylabel('frequency')
     plt.xlabel('value')
@@ -162,4 +156,4 @@ def histograms(file, num_points):
     plt.show()
 
 
-histograms(FILE, 100)
+histograms(FILE, 500)
