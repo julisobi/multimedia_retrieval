@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
+import math
 
 FILE = 'm107.off'
 FILE2 = 'lobster.ply'
@@ -91,11 +92,18 @@ def save_ouput(fold):
                 long_boundbox.append(round(float(max(mesh.bounding_box.extents)), 5))
 
             #if str(type_of_faces) == "triangles":
-            new_dict = {"shape_class": str(dir), "num_verticles": int(num_vert), "num_faces": int(num_faces),
-                        "faces_type": str(type_of_faces), "axis_bound_box": mesh.bounding_box.extents,
-                        "bound_box": mesh.bounding_box_oriented.extents, "path": filename,
-                        "watertight": mesh.is_watertight, "area": mesh.area,
-                        "volume": mesh.volume, "compactness": mesh.volume / mesh.bounding_sphere.volume,
+            new_dict = {"shape_class": str(dir),
+                        "num_verticles": int(num_vert),
+                        "num_faces": int(num_faces),
+                        "faces_type": str(type_of_faces),
+                        "axis_bound_box": mesh.bounding_box.extents,
+                        "bound_box": mesh.bounding_box_oriented.extents,
+                        "path": filename,
+                        "watertight": mesh.is_watertight,
+                        "area": mesh.area,
+                        "volume": mesh.volume,
+                        "compactness": mesh.volume / mesh.bounding_sphere.volume,
+                        "diameter": ((6*mesh.bounding_sphere.volume) / math.pi) ** (1./3.),
                         "bound_box_volume": mesh.bounding_box_oriented.volume}
             output.append(new_dict)
             i += 1
