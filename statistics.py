@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
 from numpy import mean, quantile
 from read_data import view_3d
 
