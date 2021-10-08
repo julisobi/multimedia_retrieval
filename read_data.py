@@ -136,6 +136,8 @@ def save_ouput(fold):
                 norm_dist.append(dist)
                 long_boundbox.append(round(float(max(mesh.bounding_box.extents)), 5))
 
+            diam = diameter(mesh)
+
             #if str(type_of_faces) == "triangles":
             new_dict = {"shape_class": str(dir),
                         "num_verticles": int(num_vert),
@@ -147,8 +149,8 @@ def save_ouput(fold):
                         "watertight": mesh.is_watertight,
                         "area": mesh.area,
                         "volume": mesh.volume,
-                        "compactness": mesh.volume / mesh.bounding_sphere.volume,
-                        "diameter": ((6*mesh.bounding_sphere.volume) / math.pi) ** (1./3.),
+                        "compactness": mesh.area ** 3 / mesh.bounding_sphere.volume,
+                        "diameter": diameter,
                         "bound_box_volume": mesh.bounding_box_oriented.volume}
             output.append(new_dict)
             i += 1
@@ -156,6 +158,17 @@ def save_ouput(fold):
     print(f"Number of 3D objects in dataset: {i}")
     return output
 
+
+def diameter(mesh):
+    diam = 0
+    print(mesh.vertices[0])
+    for vertex in mesh.vertices:
+        a = np.array([vertex[0], vertex[1], vertex[2]])
+        for vertex2 in mesh.vertices:
+            b = np.array([vertex2[0], vertex2[1], vertex2[2]])
+            if distance_two_point(a, b) > diam:
+                diam = abs(np.linalg.norm(a-b))
+    return diam
 
 def distance_two_point(p1, p2):
     #p1 = np.array([x1_coords, y1_coords, z1_coords])
@@ -215,6 +228,8 @@ def before_and_after_scale_images():
     (mesh + mesh2).show()
 
 # # uncomment the line below to save the excel file
-# save_excel(DIR)
+#save_excel(DIR)
+mesh = trimesh.load(FILE, force='mesh')
+diam = diameter(mesh)
 
 normalization_tool(FILE)
