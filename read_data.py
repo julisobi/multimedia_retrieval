@@ -18,6 +18,35 @@ def view_3d(file):
     mesh.show()
 
 
+def x_y_z(file):
+    x, y, z = [], [], []
+    with open(file) as f:
+        for line in f.readlines()[2:]:
+            if line[:2] not in ['3 ', '4 ']:
+                x.append(line.split()[0])
+                y.append(line.split()[1])
+                z.append(line.split()[2])
+    return x, y, z
+
+
+def pca(file):
+    x_coords, y_coords, z_coords = x_y_z(file)
+    n_points = len(x_coords)
+
+    A = np.zeros((3, n_points))
+    A[0] = x_coords
+    A[1] = y_coords
+    A[2] = z_coords
+
+    A_cov = np.cov(A)  # 3x3 matrix
+    eigenvalues, eigenvectors = np.linalg.eig(A_cov)
+
+    print("==> eigenvalues for (x, y, z)")
+    print(eigenvalues)
+    print("\n==> eigenvectors")
+    print(eigenvectors)
+
+
 def normalization_tool(file):
     mesh = trimesh.load(file, force='mesh')
 
@@ -27,6 +56,22 @@ def normalization_tool(file):
                         [0, 0, 1, -mesh.center_mass[2]],
                         [0, 0, 0, 1]]
     mesh.apply_transform(translate_matrix)
+
+    # Alignment
+    n_points = len(mesh.vertices)
+    A = np.zeros((3, n_points))
+    A[0] = mesh.vertices.transpose()[0]
+    A[1] = mesh.vertices.transpose()[1]
+    A[2] = mesh.vertices.transpose()[2]
+    A_cov = np.cov(A)
+    eigenvalues, eigenvectors = np.linalg.eig(A_cov)
+    e1_e2 = np.cross(eigenvectors[0], eigenvectors[1])
+    E = np.zeros((3, 3))
+    E[0] = eigenvectors[0]
+    E[1] = eigenvectors[1]
+    E[2] = e1_e2
+    updated = np.dot(A.transpose(), E)
+    mesh.vertices = updated
 
     # Normalization scale
     bound_box = mesh.bounding_box
@@ -171,3 +216,5 @@ def before_and_after_scale_images():
 
 # # uncomment the line below to save the excel file
 # save_excel(DIR)
+
+normalization_tool(FILE)
