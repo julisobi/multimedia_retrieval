@@ -84,7 +84,7 @@ def normalization_tool(file):
                     [0, 0, 0, 1]]
 
     mesh.apply_transform(scale_matrix)
-    return mesh
+    return mesh, E
 
 
 def save_ouput(fold):
@@ -99,7 +99,7 @@ def save_ouput(fold):
 
     for dir in tqdm(os.listdir(fold)):
         for filename in glob.iglob(f'{fold}/{dir}/*.off'):
-            mesh = normalization_tool(filename)
+            mesh, Eigen = normalization_tool(filename)
             triangles, quads = False, False
             type_of_faces = ''
             with open(filename) as f:
@@ -136,7 +136,9 @@ def save_ouput(fold):
                 norm_dist.append(dist)
                 long_boundbox.append(round(float(max(mesh.bounding_box.extents)), 5))
 
+            # Comment line under this one and uncomment the on under that if you don't want to wait for hours.
             diam = diameter(mesh)
+            #diam = 0
 
             #if str(type_of_faces) == "triangles":
             new_dict = {"shape_class": str(dir),
@@ -151,6 +153,7 @@ def save_ouput(fold):
                         "volume": mesh.volume,
                         "compactness": mesh.area ** 3 / mesh.bounding_sphere.volume,
                         "diameter": diameter,
+                        "eccentricity": (Eigen[0] / Eigen[2]),
                         "bound_box_volume": mesh.bounding_box_oriented.volume}
             output.append(new_dict)
             i += 1
@@ -228,8 +231,9 @@ def before_and_after_scale_images():
     (mesh + mesh2).show()
 
 # # uncomment the line below to save the excel file
-#save_excel(DIR)
-mesh = trimesh.load(FILE, force='mesh')
-diam = diameter(mesh)
+save_excel(DIR)
 
-normalization_tool(FILE)
+#mesh = trimesh.load(FILE, force='mesh')
+#diam = diameter(mesh)
+
+#normalization_tool(FILE)
