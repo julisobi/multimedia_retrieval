@@ -5,7 +5,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
-import math
+from scipy.spatial import ConvexHull
+from scipy.spatial.distance import cdist
 
 FILE = 'm107.off'
 FILE2 = 'Bust_305.off'
@@ -102,9 +103,9 @@ def save_ouput(fold):
                 for line in f.readlines():
                     if num_line == 2:
                         second_line = line
-                    if line[0] == '3':
+                    if line[:2] == '3 ':
                         triangles = True
-                    elif line[0] == '4':
+                    elif line[:2] == '4 ':
                         quads = True
                     num_line += 1
                 if triangles and quads:
@@ -132,8 +133,8 @@ def save_ouput(fold):
                 long_boundbox.append(round(float(max(mesh.bounding_box.extents)), 5))
 
             # Comment line under this one and uncomment the on under that if you don't want to wait for hours.
-            diam = diameter(mesh)
-            #diam = 0
+            diam = diameter2(mesh)
+            # diam = 0
 
             #if str(type_of_faces) == "triangles":
             new_dict = {"shape_class": str(dir),
@@ -147,12 +148,11 @@ def save_ouput(fold):
                         "area": mesh.area,
                         "volume": mesh.volume,
                         "compactness": mesh.area ** 3 / mesh.bounding_sphere.volume,
-                        "diameter": diameter,
+                        "diameter": diam,
                         "eccentricity": (Eigen[0] / Eigen[2]),
                         "bound_box_volume": mesh.bounding_box_oriented.volume}
             output.append(new_dict)
             i += 1
-
     print(f"Number of 3D objects in dataset: {i}")
     return output
 
@@ -168,9 +168,18 @@ def diameter(mesh):
                 diam = abs(np.linalg.norm(a-b))
     return diam
 
+
+def diameter2(mesh):
+    vertices = mesh.vertices
+    hull = ConvexHull(vertices)
+    hullpoints = vertices[hull.vertices, :]
+    hdist = cdist(hullpoints, hullpoints, metric='euclidean')
+    bestpair = np.unravel_index(hdist.argmax(), hdist.shape)
+    diam = distance_two_point(hullpoints[bestpair[0]], hullpoints[bestpair[1]])
+    return diam
+
+
 def distance_two_point(p1, p2):
-    #p1 = np.array([x1_coords, y1_coords, z1_coords])
-    #p2 = np.array([x2_coords, y2_coords, z2_coords])
     squared_dist = np.sum((p1 - p2) ** 2, axis=0)
     return np.sqrt(squared_dist)
 
@@ -226,7 +235,7 @@ def before_and_after_scale_images():
     (mesh + mesh2).show()
 
 # # uncomment the line below to save the excel file
-# save_excel(DIR)
+save_excel(DIR)
 
 # mesh = trimesh.load(FILE, force='mesh')
 # diam = diameter(mesh)
