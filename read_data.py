@@ -18,35 +18,6 @@ def view_3d(file):
     mesh.show()
 
 
-def x_y_z(file):
-    x, y, z = [], [], []
-    with open(file) as f:
-        for line in f.readlines()[2:]:
-            if line[:2] not in ['3 ', '4 ']:
-                x.append(line.split()[0])
-                y.append(line.split()[1])
-                z.append(line.split()[2])
-    return x, y, z
-
-
-def pca(file):
-    x_coords, y_coords, z_coords = x_y_z(file)
-    n_points = len(x_coords)
-
-    A = np.zeros((3, n_points))
-    A[0] = x_coords
-    A[1] = y_coords
-    A[2] = z_coords
-
-    A_cov = np.cov(A)  # 3x3 matrix
-    eigenvalues, eigenvectors = np.linalg.eig(A_cov)
-
-    print("==> eigenvalues for (x, y, z)")
-    print(eigenvalues)
-    print("\n==> eigenvectors")
-    print(eigenvectors)
-
-
 def normalization_tool(file):
     mesh = trimesh.load(file, force='mesh')
 
@@ -255,9 +226,7 @@ def before_and_after_scale_images():
     (mesh + mesh2).show()
 
 # # uncomment the line below to save the excel file
-save_excel(DIR)
+# save_excel(DIR)
 
-#mesh = trimesh.load(FILE, force='mesh')
-#diam = diameter(mesh)
-
-#normalization_tool(FILE)
+# mesh = trimesh.load(FILE, force='mesh')
+# diam = diameter(mesh)
