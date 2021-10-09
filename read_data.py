@@ -8,7 +8,7 @@ from tqdm import tqdm
 import math
 
 FILE = 'm107.off'
-FILE2 = 'lobster.ply'
+FILE2 = 'Bust_305.off'
 DIR = 'LabeledDB_new'
 trimesh.util.attach_to_log()
 
@@ -72,6 +72,30 @@ def normalization_tool(file):
     E[2] = e1_e2
     updated = np.dot(A.transpose(), E)
     mesh.vertices = updated
+
+    # Flipping test
+    fx, fy, fz = [], [], []
+    for i in range(len(mesh.triangles)):
+        Cx = sum(mesh.triangles[i][:,0])/3
+        sign_Cx = np.sign(Cx)
+        sq_Cx = np.square(Cx)
+        fx.append(sign_Cx * sq_Cx)
+
+        Cy = sum(mesh.triangles[i][:, 1]) / 3
+        sign_Cy = np.sign(Cy)
+        sq_Cy = np.square(Cy)
+        fy.append(sign_Cy * sq_Cy)
+
+        Cz = sum(mesh.triangles[i][:, 2]) / 3
+        sign_Cz = np.sign(Cz)
+        sq_Cz = np.square(Cz)
+        fz.append(sign_Cz * sq_Cz)
+    fx_value = sum(fx)
+    fy_value = sum(fy)
+    fz_value = sum(fz)
+    mesh.vertices[:, 0] *= np.sign(fx_value)
+    mesh.vertices[:, 1] *= np.sign(fy_value)
+    mesh.vertices[:, 2] *= np.sign(fz_value)
 
     # Normalization scale
     bound_box = mesh.bounding_box
