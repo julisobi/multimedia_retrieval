@@ -27,11 +27,9 @@ def distance(p1, p2):
 
 def a3(file):
     points = save_points(file)
-    random_p1 = np.array(random.choice(points))
-    random_p2 = np.array(random.choice(points))
-    random_p3 = np.array(random.choice(points))
-    ba = random_p1 - random_p2
-    bc = random_p3 - random_p2
+    random_points = random.sample(points, 3)
+    ba = random_points[0] - random_points[1]
+    bc = random_points[2] - random_points[1]
     cosine_angle = np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc))
     angle = np.arccos(cosine_angle)
     return np.degrees(angle)
@@ -48,20 +46,17 @@ def d1(file):
 
 def d2(file):
     points = save_points(file)
-    random_p1 = np.array(random.choice(points))
-    random_p2 = np.array(random.choice(points))
-    dist = distance(random_p1, random_p2)
+    random_points = random.sample(points, 2)
+    dist = distance(np.array(random_points[0]), np.array(random_points[1]))
     return dist
 
 
 def d3(file):
     points = save_points(file)
-    random_p1 = np.array(random.choice(points))
-    random_p2 = np.array(random.choice(points))
-    random_p3 = np.array(random.choice(points))
-    dist1 = distance(random_p1, random_p2)
-    dist2 = distance(random_p2, random_p3)
-    dist3 = distance(random_p1, random_p3)
+    random_points = random.sample(points, 3)
+    dist1 = distance(np.array(random_points[0]), np.array(random_points[1]))
+    dist2 = distance(np.array(random_points[1]), np.array(random_points[2]))
+    dist3 = distance(np.array(random_points[0]), np.array(random_points[2]))
     s = (dist1 + dist2 + dist3) / 2
     area = (s * (s - dist1) * (s - dist2) * (s - dist3)) ** 0.5
     sr = area ** 0.5
@@ -70,13 +65,10 @@ def d3(file):
 
 def d4(file):
     points = save_points(file)
-    random_p1 = np.array(random.choice(points))
-    random_p2 = np.array(random.choice(points))
-    random_p3 = np.array(random.choice(points))
-    random_p4 = np.array(random.choice(points))
-    ad = random_p1 - random_p4
-    bd = random_p2 - random_p4
-    cd = random_p3 - random_p4
+    random_points = random.sample(points, 4)
+    ad = np.array(random_points[0]) - np.array(random_points[3])
+    bd = np.array(random_points[1]) - np.array(random_points[3])
+    cd = np.array(random_points[2]) - np.array(random_points[3])
     val = np.array([ad, bd, cd])
     abs_val = abs(np.linalg.det(val))
     volume = abs_val / 6
@@ -115,15 +107,19 @@ def save_values_d3(file, num_points):
 
 def save_values_d4(file, num_points):
     d4_val = []
+    k=0
     for i in range(num_points):
+        k+=1
+        if k in [10000, 50000, 100000, 200000, 300000, 400000]:
+            print(k)
         d4_val.append(d4(file))
     return d4_val
 
 
-def histograms(file, num_points):
-    a3, d1, d2, d3, d4 = save_values_a3(file, num_points), save_values_d1(file, num_points), \
-                         save_values_d2(file, num_points), save_values_d3(file, num_points), \
-                         save_values_d4(file, num_points)
+def histograms(file):
+    a3, d1, d2, d3, d4 = save_values_a3(file, 50000), save_values_d1(file, 1000), \
+                         save_values_d2(file, 10000), save_values_d3(file, 50000), \
+                         save_values_d4(file, 500000)
 
     plt.hist(a3, rwidth=0.95)
     plt.title('Distribution of a3 values')
@@ -156,4 +152,4 @@ def histograms(file, num_points):
     plt.show()
 
 
-histograms(FILE, 500)
+# histograms(FILE)
