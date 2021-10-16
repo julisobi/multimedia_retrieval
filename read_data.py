@@ -19,17 +19,16 @@ def view_3d(file):
     mesh.show()
 
 
-def normalization_tool(file):
-    mesh = trimesh.load(file, force='mesh')
-
-    # Normalization of position
+def position(mesh):
     translate_matrix = [[1, 0, 0, -mesh.center_mass[0]],
                         [0, 1, 0, -mesh.center_mass[1]],
                         [0, 0, 1, -mesh.center_mass[2]],
                         [0, 0, 0, 1]]
     mesh.apply_transform(translate_matrix)
+    return mesh
 
-    # Alignment
+
+def alignment(mesh):
     n_points = len(mesh.vertices)
     A = np.zeros((3, n_points))
     A[0] = mesh.vertices.transpose()[0]
@@ -44,8 +43,10 @@ def normalization_tool(file):
     E[2] = e1_e2
     updated = np.dot(A.transpose(), E)
     mesh.vertices = updated
+    return mesh, E
 
-    # Flipping test
+
+def orientation(mesh):
     fx, fy, fz = [], [], []
     for i in range(len(mesh.triangles)):
         Cx = sum(mesh.triangles[i][:,0])/3
@@ -62,14 +63,17 @@ def normalization_tool(file):
         sign_Cz = np.sign(Cz)
         sq_Cz = np.square(Cz)
         fz.append(sign_Cz * sq_Cz)
+
     fx_value = sum(fx)
     fy_value = sum(fy)
     fz_value = sum(fz)
     mesh.vertices[:, 0] *= np.sign(fx_value)
     mesh.vertices[:, 1] *= np.sign(fy_value)
     mesh.vertices[:, 2] *= np.sign(fz_value)
+    return mesh
 
-    # Normalization scale
+
+def scale(mesh):
     bound_box = mesh.bounding_box
     smallest = max(bound_box.extents)
     scale = 1 / smallest
@@ -80,6 +84,19 @@ def normalization_tool(file):
                     [0, 0, 0, 1]]
 
     mesh.apply_transform(scale_matrix)
+    return mesh
+
+
+def normalization_tool(file):
+    mesh = trimesh.load(file, force='mesh')
+    # Normalization of position
+    mesh = position(mesh)
+    # Alignment
+    mesh, E = alignment(mesh)
+    # Flipping test
+    mesh = orientation(mesh)
+    # Normalization scale
+    mesh = scale(mesh)
     return mesh, E
 
 
@@ -235,7 +252,98 @@ def before_and_after_scale_images():
     (mesh + mesh2).show()
 
 # # uncomment the line below to save the excel file
-save_excel(DIR)
+# save_excel(DIR)
 
 # mesh = trimesh.load(FILE, force='mesh')
 # diam = diameter(mesh)
+
+
+def proof_alignment(folder):
+    cos_list, cos_list_new = [], []
+    x_vector = np.array([1,0,0])
+    for dir in tqdm(os.listdir(folder)):
+        for filename in glob.iglob(f'{folder}/{dir}/*.off'):
+            mesh = trimesh.load(filename, force='mesh')
+            mesh = position(mesh)
+            n_points = len(mesh.vertices)
+            A = np.zeros((3, n_points))
+            A[0] = mesh.vertices.transpose()[0]
+            A[1] = mesh.vertices.transpose()[1]
+            A[2] = mesh.vertices.transpose()[2]
+            A_cov = np.cov(A)
+            eigenvalues, eigenvectors = np.linalg.eig(A_cov)
+            cos = abs(np.dot(eigenvectors[0], x_vector) / np.linalg.norm(eigenvectors[0]) / np.linalg.norm(x_vector))
+            cos_list.append(cos)
+            e1_e2 = np.cross(eigenvectors[0], eigenvectors[1])
+            E = np.zeros((3, 3))
+            E[0] = eigenvectors[0]
+            E[1] = eigenvectors[1]
+            E[2] = e1_e2
+            updated = np.dot(A.transpose(), E)
+            A_new = np.zeros((3, n_points))
+            A_new[0] = updated.transpose()[0]
+            A_new[1] = updated.transpose()[1]
+            A_new[2] = updated.transpose()[2]
+            A_cov_new = np.cov(A_new)
+            eigenvalues_new, eigenvectors_new = np.linalg.eig(A_cov_new)
+            cos_new = abs(np.dot(eigenvectors_new[0], x_vector) / np.linalg.norm(eigenvectors_new[0]) / np.linalg.norm(x_vector))
+            cos_list_new.append(cos_new)
+    plt.hist(cos_list, rwidth=0.95, bins=15)
+    plt.title('Cosine of angle between a major eigenvector and the X axis')
+    plt.ylabel('frequency')
+    plt.xlabel('cosine')
+    plt.show()
+
+    plt.hist(cos_list_new, rwidth=0.95, bins=15)
+    plt.title('Cosine of angle between a new major eigenvector and the X axis')
+    plt.ylabel('frequency')
+    plt.xlabel('cosine')
+    plt.show()
+
+
+# def proof_orientation(folder):
+#     x_list, y_list, z_list = [], [], []
+#     x_new_list, y_new_list, z_new_list = [], [], []
+#     for dir in tqdm(os.listdir(DIR)):
+#         for filename in glob.iglob(f'{DIR}/{dir}/*.off'):
+#             mesh = trimesh.load(filename, force='mesh')
+#             mesh = position(mesh)
+#             mesh = alignment(mesh)
+#             ...
+#
+#     plt.hist(x_list, rwidth=0.95, bins=10)
+#     plt.title('Distribution of center of mass (x coordinates) before flipping test')
+#     plt.ylabel('frequency')
+#     plt.xlabel('x coordinates')
+#     plt.show()
+#
+#     plt.hist(y_list, rwidth=0.95, bins=10)
+#     plt.title('Distribution of center of mass (y coordinates) before flipping test')
+#     plt.ylabel('frequency')
+#     plt.xlabel('y coordinates')
+#     plt.show()
+#
+#     plt.hist(z_list, rwidth=0.95, bins=10)
+#     plt.title('Distribution of center of mass (z coordinates) before flipping test')
+#     plt.ylabel('frequency')
+#     plt.xlabel('z coordinates')
+#     plt.show()
+#
+#     plt.hist(x_new_list, rwidth=0.95, bins=10)
+#     plt.title('Distribution of center of mass (x coordinates) after flipping test')
+#     plt.ylabel('frequency')
+#     plt.xlabel('x cooridnates')
+#     plt.show()
+#
+#     plt.hist(y_new_list, rwidth=0.95, bins=10)
+#     plt.title('Distribution of center of mass (y coordinates) after flipping test')
+#     plt.ylabel('frequency')
+#     plt.xlabel('y coordinates')
+#     plt.show()
+#
+#     plt.hist(z_new_list, rwidth=0.95, bins=10)
+#     plt.title('Distribution of center of mass (z coordinates) after flipping test')
+#     plt.ylabel('frequency')
+#     plt.xlabel('z coordinates')
+#     plt.show()
+
