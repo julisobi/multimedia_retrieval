@@ -347,3 +347,93 @@ def proof_alignment(folder):
 #     plt.xlabel('z coordinates')
 #     plt.show()
 
+
+def proof_alignment(folder):
+    cos_list, cos_list_new = [], []
+    x_vector = np.array([1,0,0])
+    for dir in tqdm(os.listdir(folder)):
+        for filename in glob.iglob(f'{folder}/{dir}/*.off'):
+            mesh = trimesh.load(filename, force='mesh')
+            mesh = position(mesh)
+            n_points = len(mesh.vertices)
+            A = np.zeros((3, n_points))
+            A[0] = mesh.vertices.transpose()[0]
+            A[1] = mesh.vertices.transpose()[1]
+            A[2] = mesh.vertices.transpose()[2]
+            A_cov = np.cov(A)
+            eigenvalues, eigenvectors = np.linalg.eig(A_cov)
+            cos = abs(np.dot(eigenvectors[0], x_vector) / np.linalg.norm(eigenvectors[0]) / np.linalg.norm(x_vector))
+            cos_list.append(cos)
+            e1_e2 = np.cross(eigenvectors[0], eigenvectors[1])
+            E = np.zeros((3, 3))
+            E[0] = eigenvectors[0]
+            E[1] = eigenvectors[1]
+            E[2] = e1_e2
+            updated = np.dot(A.transpose(), E)
+            A_new = np.zeros((3, n_points))
+            A_new[0] = updated.transpose()[0]
+            A_new[1] = updated.transpose()[1]
+            A_new[2] = updated.transpose()[2]
+            A_cov_new = np.cov(A_new)
+            eigenvalues_new, eigenvectors_new = np.linalg.eig(A_cov_new)
+            cos_new = abs(np.dot(eigenvectors_new[0], x_vector) / np.linalg.norm(eigenvectors_new[0]) / np.linalg.norm(x_vector))
+            cos_list_new.append(cos_new)
+    plt.hist(cos_list, rwidth=0.95, bins=15)
+    plt.title('Cosine of angle between a major eigenvector and the X axis')
+    plt.ylabel('frequency')
+    plt.xlabel('cosine')
+    plt.show()
+
+    plt.hist(cos_list_new, rwidth=0.95, bins=15)
+    plt.title('Cosine of angle between a new major eigenvector and the X axis')
+    plt.ylabel('frequency')
+    plt.xlabel('cosine')
+    plt.show()
+
+
+# def proof_orientation(folder):
+#     x_list, y_list, z_list = [], [], []
+#     x_new_list, y_new_list, z_new_list = [], [], []
+#     for dir in tqdm(os.listdir(DIR)):
+#         for filename in glob.iglob(f'{DIR}/{dir}/*.off'):
+#             mesh = trimesh.load(filename, force='mesh')
+#             mesh = position(mesh)
+#             mesh = alignment(mesh)
+#             ...
+#
+#     plt.hist(x_list, rwidth=0.95, bins=10)
+#     plt.title('Distribution of center of mass (x coordinates) before flipping test')
+#     plt.ylabel('frequency')
+#     plt.xlabel('x coordinates')
+#     plt.show()
+#
+#     plt.hist(y_list, rwidth=0.95, bins=10)
+#     plt.title('Distribution of center of mass (y coordinates) before flipping test')
+#     plt.ylabel('frequency')
+#     plt.xlabel('y coordinates')
+#     plt.show()
+#
+#     plt.hist(z_list, rwidth=0.95, bins=10)
+#     plt.title('Distribution of center of mass (z coordinates) before flipping test')
+#     plt.ylabel('frequency')
+#     plt.xlabel('z coordinates')
+#     plt.show()
+#
+#     plt.hist(x_new_list, rwidth=0.95, bins=10)
+#     plt.title('Distribution of center of mass (x coordinates) after flipping test')
+#     plt.ylabel('frequency')
+#     plt.xlabel('x cooridnates')
+#     plt.show()
+#
+#     plt.hist(y_new_list, rwidth=0.95, bins=10)
+#     plt.title('Distribution of center of mass (y coordinates) after flipping test')
+#     plt.ylabel('frequency')
+#     plt.xlabel('y coordinates')
+#     plt.show()
+#
+#     plt.hist(z_new_list, rwidth=0.95, bins=10)
+#     plt.title('Distribution of center of mass (z coordinates) after flipping test')
+#     plt.ylabel('frequency')
+#     plt.xlabel('z coordinates')
+#     plt.show()
+
