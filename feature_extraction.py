@@ -28,8 +28,8 @@ def distance(p1, p2):
 def a3(file):
     points = save_points(file)
     random_points = random.sample(points, 3)
-    ba = random_points[0] - random_points[1]
-    bc = random_points[2] - random_points[1]
+    ba = np.array(random_points[0]) - np.array(random_points[1])
+    bc = np.array(random_points[2]) - np.array(random_points[1])
     cosine_angle = np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc))
     angle = np.arccos(cosine_angle)
     return np.degrees(angle)
@@ -150,6 +150,3 @@ def histograms(file):
     plt.ylabel('frequency')
     plt.xlabel('value')
     plt.show()
-
-
-# histograms(FILE)
