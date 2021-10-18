@@ -150,11 +150,17 @@ def save_ouput(fold):
                 norm_dist.append(dist)
                 long_boundbox.append(round(float(max(mesh.bounding_box.extents)), 5))
 
-            # Comment line under this one and uncomment the on under that if you don't want to wait for hours.
             diam = diameter2(mesh)
-            # diam = 0
 
-            #if str(type_of_faces) == "triangles":
+            len_eigen_major = distance_two_point([0, 0, 0], Eigen[0])
+            len_eigen_minor = distance_two_point([0, 0, 0], Eigen[2])
+            print("eigen 0", Eigen[0])
+            print("eigen 2", Eigen[2])
+            print("len_eigen minor", len_eigen_minor)
+            print("len_eigen major", len_eigen_major)
+            eccentricity = len_eigen_major / len_eigen_minor
+
+
             new_dict = {"shape_class": str(dir),
                         "num_verticles": int(num_vert),
                         "num_faces": int(num_faces),
@@ -162,12 +168,12 @@ def save_ouput(fold):
                         "axis_bound_box": mesh.bounding_box.extents,
                         "bound_box": mesh.bounding_box_oriented.extents,
                         "path": filename,
-                        "watertight": mesh.is_watertight,
-                        "area": mesh.area,
-                        "volume": mesh.volume,
-                        "compactness": mesh.area ** 3 / mesh.bounding_sphere.volume,
-                        "diameter": diam,
-                        "eccentricity": (Eigen[0] / Eigen[2]),
+                        "watertight": bool(mesh.is_watertight),
+                        "area": float(mesh.area),
+                        "volume": float(mesh.volume),
+                        "compactness": float(mesh.area ** 3) / float(mesh.bounding_sphere.volume),
+                        "diameter": float(diam),
+                        "eccentricity": eccentricity,
                         "bound_box_volume": mesh.bounding_box_oriented.volume}
             output.append(new_dict)
             i += 1
@@ -224,6 +230,46 @@ def save_excel(folder):
     df.to_excel('filter.xlsx')
 
 
+def show_global_descrip_examples():
+    # Examples for area descriptor
+    mesh = trimesh.load("LabeledDB_new/Glasses/52.off", force='mesh')
+    mesh.show()
+    mesh = trimesh.load("LabeledDB_new/Cup/37.off", force='mesh')
+    mesh.show()
+
+    # Examples for volume descriptor
+    mesh = trimesh.load("LabeledDB_new/Glasses/53.off", force='mesh')
+    mesh.show()
+    mesh = trimesh.load("LabeledDB_new/Mech/334.off", force='mesh')
+    mesh.show()
+
+    # Examples for compactness descriptor
+    mesh = trimesh.load("LabeledDB_new/Glasses/58.off", force='mesh')
+    mesh.show()
+    mesh = trimesh.load("LabeledDB_new/Cup/25.off", force='mesh')
+    mesh.show()
+
+    # Examples for diameter descriptor
+    mesh = trimesh.load("LabeledDB_new/Bird/252.off", force='mesh')
+    mesh.show()
+    mesh = trimesh.load("LabeledDB_new/Mech/340.off", force='mesh')
+    mesh.show()
+
+    # Examples for eccentricity descriptor
+    #mesh = trimesh.load("LabeledDB_new/Glasses/52.off", force='mesh')
+    #mesh.show()
+    #mesh = trimesh.load("LabeledDB_new/Glasses/52.off", force='mesh')
+    #mesh.show()
+
+    # Examples for AABB box volume descriptor
+    mesh = trimesh.load("LabeledDB_new/Glasses/47.off", force='mesh')
+    mesh.show()
+    mesh = trimesh.load("LabeledDB_new/Table/145.off", force='mesh')
+    mesh.show()
+
+#show_global_descrip_examples()
+
+
 def before_and_after_scale_images():
     mesh2 = trimesh.load('unit_cube.off', force='mesh')
     mesh = trimesh.load('m107.off', force='mesh')
@@ -252,12 +298,10 @@ def before_and_after_scale_images():
     print(mesh.bounding_box.extents)
     (mesh + mesh2).show()
 
-# # uncomment the line below to save the excel file
-#save_excel(DIR)
 
-#mesh = trimesh.load("LabeledDB_new/Airplane/61.off", force='mesh')
-#mesh.show()
-# diam = diameter(mesh)
+# # uncomment the line below to save the excel file
+save_excel(DIR)
+
 
 
 def proof_alignment(folder):
