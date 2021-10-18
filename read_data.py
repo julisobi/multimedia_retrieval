@@ -253,9 +253,10 @@ def before_and_after_scale_images():
     (mesh + mesh2).show()
 
 # # uncomment the line below to save the excel file
-# save_excel(DIR)
+#save_excel(DIR)
 
-# mesh = trimesh.load(FILE, force='mesh')
+#mesh = trimesh.load("LabeledDB_new/Airplane/61.off", force='mesh')
+#mesh.show()
 # diam = diameter(mesh)
 
 
