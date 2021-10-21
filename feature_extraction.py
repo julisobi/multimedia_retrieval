@@ -1,6 +1,7 @@
 import numpy as np
 import random
 import trimesh
+import math
 import matplotlib.pyplot as plt
 
 FILE = "m107.off"
@@ -23,30 +24,30 @@ def a3(points):
 
 
 def d1(points, center):
-    random_p = random.choice(points)
+    random_p = random.choice(list(points))
     dist = distance(center, random_p)
     return dist
 
 
 def d2(points):
-    random_points = random.sample(points, 2)
+    random_points = random.sample(list(points), 2)
     dist = distance(np.array(random_points[0]), np.array(random_points[1]))
     return dist
 
 
 def d3(points):
-    random_points = random.sample(points, 3)
+    random_points = random.sample(list(points), 3)
     dist1 = distance(np.array(random_points[0]), np.array(random_points[1]))
     dist2 = distance(np.array(random_points[1]), np.array(random_points[2]))
     dist3 = distance(np.array(random_points[0]), np.array(random_points[2]))
     s = (dist1 + dist2 + dist3) / 2
-    area = (s * (s - dist1) * (s - dist2) * (s - dist3)) ** 0.5
-    sr = area ** 0.5
+    area = math.sqrt(s * (s - dist1) * (s - dist2) * (s - dist3))
+    sr = area ** 2
     return sr
 
 
 def d4(points):
-    random_points = random.sample(points, 4)
+    random_points = random.sample(list(points), 4)
     ad = np.array(random_points[0]) - np.array(random_points[3])
     bd = np.array(random_points[1]) - np.array(random_points[3])
     cd = np.array(random_points[2]) - np.array(random_points[3])
