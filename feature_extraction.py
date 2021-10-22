@@ -14,7 +14,7 @@ def distance(p1, p2):
     return dist
 
 
-def a3(points):
+def a3(points): 
     random_points = random.sample(list(points), 3)
     ba = np.array(random_points[0]) - np.array(random_points[1])
     bc = np.array(random_points[2]) - np.array(random_points[1])
@@ -25,8 +25,7 @@ def a3(points):
 
 def d1(points, center):
     random_p = random.choice(list(points))
-    dist = distance(center, random_p)
-    return dist
+    return distance(center, random_p)
 
 
 def d2(points):
@@ -58,16 +57,14 @@ def d4(points):
     return cr
 
 
-def save_values_a3(file, num_points):
-    mesh = trimesh.load(file, force='mesh')
+def save_values_a3(mesh, num_points):
     a3_val = []
     for i in range(num_points):
         a3_val.append(a3(mesh.vertices))
     return a3_val
 
 
-def save_values_d1(file, num_points):
-    mesh = trimesh.load(file, force='mesh')
+def save_values_d1(mesh, num_points):
     center = mesh.center_mass
     d1_val = []
     for i in range(num_points):
@@ -75,24 +72,21 @@ def save_values_d1(file, num_points):
     return d1_val
 
 
-def save_values_d2(file, num_points):
-    mesh = trimesh.load(file, force='mesh')
+def save_values_d2(mesh, num_points):
     d2_val = []
     for i in range(num_points):
         d2_val.append(d2(mesh.vertices))
     return d2_val
 
 
-def save_values_d3(file, num_points):
-    mesh = trimesh.load(file, force='mesh')
+def save_values_d3(mesh, num_points):
     d3_val = []
     for i in range(num_points):
         d3_val.append(d3(mesh.vertices))
     return d3_val
 
 
-def save_values_d4(file, num_points):
-    mesh = trimesh.load(file, force='mesh')
+def save_values_d4(mesh, num_points):
     d4_val = []
     for i in range(num_points):
         d4_val.append(d4(mesh.vertices))

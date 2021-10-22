@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 from scipy.spatial import ConvexHull
 from scipy.spatial.distance import cdist
+from property_descriptor_plots import get_data_for_plot
+import feature_extraction as f_e
 
 FILE = 'm107.off'
 FILE2 = 'Bust_305.off'
@@ -30,6 +32,7 @@ def position(mesh):
 
 
 def alignment(mesh):
+    # numpy.linalg.eigvals?
     n_points = len(mesh.vertices)
     A = np.zeros((3, n_points))
     A[0] = mesh.vertices.transpose()[0]
@@ -50,7 +53,7 @@ def alignment(mesh):
 def orientation(mesh):
     fx, fy, fz = [], [], []
     for i in range(len(mesh.triangles)):
-        Cx = sum(mesh.triangles[i][:,0])/3
+        Cx = sum(mesh.triangles[i][:, 0]) / 3
         sign_Cx = np.sign(Cx)
         sq_Cx = np.square(Cx)
         fx.append(sign_Cx * sq_Cx)
@@ -88,8 +91,7 @@ def scale(mesh):
     return mesh
 
 
-def normalization_tool(file):
-    mesh = trimesh.load(file, force='mesh')
+def normalization_tool(mesh):
     # Normalization of position
     mesh = position(mesh)
     # Alignment
@@ -113,7 +115,8 @@ def save_ouput(fold):
 
     for dir in tqdm(os.listdir(fold)):
         for filename in glob.iglob(f'{fold}/{dir}/*.off'):
-            mesh, Eigen = normalization_tool(filename)
+            mesh = trimesh.load(filename, force='mesh')
+            mesh, Eigen = normalization_tool(mesh)
             triangles, quads = False, False
             type_of_faces = ''
             with open(filename) as f:
@@ -137,11 +140,10 @@ def save_ouput(fold):
                 num_faces = second_line.split()[1]
                 num_vert = second_line.split()[0]
 
-                #mesh = trimesh.load(filename, force='mesh')
+                # mesh = trimesh.load(filename, force='mesh')
                 p1 = np.array([mesh.center_mass[0], mesh.center_mass[1], mesh.center_mass[2]])
                 p2 = np.array([0, 0, 0])
                 dist = distance_two_point(p1, p2)
-
 
                 # Append the necessary info to variables for histograms
                 vertice_nums.append(int(num_vert))
@@ -154,12 +156,8 @@ def save_ouput(fold):
 
             len_eigen_major = distance_two_point([0, 0, 0], Eigen[0])
             len_eigen_minor = distance_two_point([0, 0, 0], Eigen[2])
-            print("eigen 0", Eigen[0])
-            print("eigen 2", Eigen[2])
-            print("len_eigen minor", len_eigen_minor)
-            print("len_eigen major", len_eigen_major)
             eccentricity = len_eigen_major / len_eigen_minor
-
+            mesh_volume = abs(float(mesh.volume))
 
             new_dict = {"shape_class": str(dir),
                         "num_verticles": int(num_vert),
@@ -170,11 +168,17 @@ def save_ouput(fold):
                         "path": filename,
                         "watertight": bool(mesh.is_watertight),
                         "area": float(mesh.area),
-                        "volume": float(mesh.volume),
-                        "compactness": float(mesh.area ** 3) / float(mesh.bounding_sphere.volume),
+                        "volume": mesh_volume,
+                        "compactness": float((mesh.area ** 3) / (36 * np.pi * (mesh_volume ** 2))),
                         "diameter": float(diam),
                         "eccentricity": eccentricity,
-                        "bound_box_volume": mesh.bounding_box_oriented.volume}
+                        "bound_box_volume": mesh.bounding_box_oriented.volume,
+                        "a3": f_e.save_values_a3(mesh, 500),
+                        "d1": f_e.save_values_d1(mesh, 500),
+                        "d2": f_e.save_values_d2(mesh, 500),
+                        "d3": f_e.save_values_d3(mesh, 500),
+                        "d4": f_e.save_values_d4(mesh, 500)
+                        }
             output.append(new_dict)
             i += 1
     print(f"Number of 3D objects in dataset: {i}")
@@ -189,7 +193,7 @@ def diameter(mesh):
         for vertex2 in mesh.vertices:
             b = np.array([vertex2[0], vertex2[1], vertex2[2]])
             if distance_two_point(a, b) > diam:
-                diam = abs(np.linalg.norm(a-b))
+                diam = abs(np.linalg.norm(a - b))
     return diam
 
 
@@ -227,7 +231,7 @@ def norm_plots(dist_list, bound_list):
 def save_excel(folder):
     out = save_ouput(folder)
     df = pd.DataFrame.from_dict(out)
-    df.to_excel('filter.xlsx')
+    df.to_excel('filter2.xlsx')
 
 
 def show_global_descrip_examples():
@@ -256,10 +260,10 @@ def show_global_descrip_examples():
     mesh.show()
 
     # Examples for eccentricity descriptor
-    #mesh = trimesh.load("LabeledDB_new/Glasses/52.off", force='mesh')
-    #mesh.show()
-    #mesh = trimesh.load("LabeledDB_new/Glasses/52.off", force='mesh')
-    #mesh.show()
+    # mesh = trimesh.load("LabeledDB_new/Glasses/52.off", force='mesh')
+    # mesh.show()
+    # mesh = trimesh.load("LabeledDB_new/Glasses/52.off", force='mesh')
+    # mesh.show()
 
     # Examples for AABB box volume descriptor
     mesh = trimesh.load("LabeledDB_new/Glasses/47.off", force='mesh')
@@ -267,7 +271,8 @@ def show_global_descrip_examples():
     mesh = trimesh.load("LabeledDB_new/Table/145.off", force='mesh')
     mesh.show()
 
-#show_global_descrip_examples()
+
+# show_global_descrip_examples()
 
 
 def before_and_after_scale_images():
@@ -292,7 +297,7 @@ def before_and_after_scale_images():
     scale_matrix = [[scale, 0, 0, 0],
                     [0, scale, 0, 0],
                     [0, 0, scale, 0],
-                    [0, 0, 0,     1]]
+                    [0, 0, 0, 1]]
 
     mesh.apply_transform(scale_matrix)
     print(mesh.bounding_box.extents)
@@ -303,10 +308,9 @@ def before_and_after_scale_images():
 save_excel(DIR)
 
 
-
 def proof_alignment(folder):
     cos_list, cos_list_new = [], []
-    x_vector = np.array([1,0,0])
+    x_vector = np.array([1, 0, 0])
     for dir in tqdm(os.listdir(folder)):
         for filename in glob.iglob(f'{folder}/{dir}/*.off'):
             mesh = trimesh.load(filename, force='mesh')
@@ -332,7 +336,8 @@ def proof_alignment(folder):
             A_new[2] = updated.transpose()[2]
             A_cov_new = np.cov(A_new)
             eigenvalues_new, eigenvectors_new = np.linalg.eig(A_cov_new)
-            cos_new = abs(np.dot(eigenvectors_new[0], x_vector) / np.linalg.norm(eigenvectors_new[0]) / np.linalg.norm(x_vector))
+            cos_new = abs(
+                np.dot(eigenvectors_new[0], x_vector) / np.linalg.norm(eigenvectors_new[0]) / np.linalg.norm(x_vector))
             cos_list_new.append(cos_new)
     plt.hist(cos_list, rwidth=0.95, bins=15)
     plt.title('Cosine of angle between a major eigenvector and the X axis')
@@ -396,7 +401,7 @@ def proof_alignment(folder):
 
 def proof_alignment(folder):
     cos_list, cos_list_new = [], []
-    x_vector = np.array([1,0,0])
+    x_vector = np.array([1, 0, 0])
     for dir in tqdm(os.listdir(folder)):
         for filename in glob.iglob(f'{folder}/{dir}/*.off'):
             mesh = trimesh.load(filename, force='mesh')
@@ -422,7 +427,8 @@ def proof_alignment(folder):
             A_new[2] = updated.transpose()[2]
             A_cov_new = np.cov(A_new)
             eigenvalues_new, eigenvectors_new = np.linalg.eig(A_cov_new)
-            cos_new = abs(np.dot(eigenvectors_new[0], x_vector) / np.linalg.norm(eigenvectors_new[0]) / np.linalg.norm(x_vector))
+            cos_new = abs(
+                np.dot(eigenvectors_new[0], x_vector) / np.linalg.norm(eigenvectors_new[0]) / np.linalg.norm(x_vector))
             cos_list_new.append(cos_new)
     plt.hist(cos_list, rwidth=0.95, bins=15)
     plt.title('Cosine of angle between a major eigenvector and the X axis')
@@ -435,7 +441,6 @@ def proof_alignment(folder):
     plt.ylabel('frequency')
     plt.xlabel('cosine')
     plt.show()
-
 
 # def proof_orientation(folder):
 #     x_list, y_list, z_list = [], [], []
@@ -482,4 +487,3 @@ def proof_alignment(folder):
 #     plt.ylabel('frequency')
 #     plt.xlabel('z coordinates')
 #     plt.show()
-

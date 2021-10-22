@@ -1,18 +1,17 @@
 import scipy.stats as stats
 import os
-import numpy as np
 import glob
 import matplotlib.pyplot as plt
-import trimesh
 from tqdm import tqdm
 import feature_extraction as fe
 
 DIR = 'LabeledDB_new'
 
+
 def normalize_histogram_vals(hist_vals):
     sample_amount = len(hist_vals)
     for index in range(len(hist_vals)):
-        hist_vals[index] = hist_vals[index]/sample_amount
+        hist_vals[index] = hist_vals[index] / sample_amount
     return hist_vals
 
 
@@ -37,15 +36,36 @@ def show_plots(data):
     fig.tight_layout()
     plt.show()
 
-data = []
-for x in range(19):
-    data.append([])
+def get_data_for_plot(descriptor):
+    data = []
+    for x in range(19):
+        data.append([])
 
-i = 0
-for dir in tqdm(os.listdir(DIR)):
-    for filename in glob.iglob(f'{DIR}/{dir}/*.off'):
-        values = fe.save_values_a3(filename, 100)
-        data[i].append(values)
-    i = i + 1
+    i = 0
+    for dir in tqdm(os.listdir(DIR)):
+        for filename in glob.iglob(f'{DIR}/{dir}/*.off'):
+            if str(descriptor) == 'a3':
+                values = fe.save_values_a3(filename, 500)
+            elif str(descriptor) == 'd1':
+                values = fe.save_values_d1(filename, 500)
+            elif str(descriptor) == 'd2':
+                values = fe.save_values_d2(filename, 500)
+            elif str(descriptor) == 'd3':
+                values = fe.save_values_d3(filename, 500)
+            elif str(descriptor) == 'd4':
+                values = fe.save_values_d4(filename, 500)
+            else:
+                print("Error: non-valid argument for get_data_for_plot")
+            data[i].append(values)
+        i = i + 1
 
-show_plots(data)
+    show_plots(data)
+
+    return data
+
+
+
+
+# MAIN
+#data = get_data_for_plot("a3")
+#show_plots(data)
