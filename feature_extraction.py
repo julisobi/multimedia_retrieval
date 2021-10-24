@@ -41,8 +41,7 @@ def d3(points):
     dist3 = distance(np.array(random_points[0]), np.array(random_points[2]))
     s = (dist1 + dist2 + dist3) / 2
     area = math.sqrt(s * (s - dist1) * (s - dist2) * (s - dist3))
-    sr = area ** 2
-    return sr
+    return area
 
 
 def d4(points):
