@@ -50,7 +50,7 @@ def alignment(mesh):
     for i in range(n_points):
         updated[i] = np.dot(A[i], eigenvectors)
     mesh.vertices = updated
-    return mesh, E
+    return mesh, E, eigenvalues
 
 
 def orientation(mesh):
@@ -98,12 +98,12 @@ def normalization_tool(mesh):
     # Normalization of position
     mesh = position(mesh)
     # Alignment
-    mesh, E = alignment(mesh)
+    mesh, E, eigenvalues = alignment(mesh)
     # Flipping test
     mesh = orientation(mesh)
     # Normalization scale
     mesh = scale(mesh)
-    return mesh, E
+    return mesh, E, eigenvalues
 
 
 def save_ouput(fold):
@@ -119,7 +119,7 @@ def save_ouput(fold):
     for dir in tqdm(os.listdir(fold)):
         for filename in glob.iglob(f'{fold}/{dir}/*.off'):
             mesh = trimesh.load(filename, force='mesh')
-            mesh, Eigen = normalization_tool(mesh)
+            mesh, eigenvectors, eigenvalues = normalization_tool(mesh)
             triangles, quads = False, False
             type_of_faces = ''
             with open(filename) as f:
@@ -157,9 +157,11 @@ def save_ouput(fold):
 
             diam = diameter2(mesh)
 
-            len_eigen_major = distance_two_point([0, 0, 0], Eigen[0])
-            len_eigen_minor = distance_two_point([0, 0, 0], Eigen[2])
-            eccentricity = len_eigen_major / len_eigen_minor
+            # len_eigen_major = distance_two_point([0, 0, 0], eigenvectors[0])
+            # len_eigen_minor = distance_two_point([0, 0, 0], eigenvectors[2])
+            # eccentricity = len_eigen_major / len_eigen_minor
+            eccentricity = eigenvalues[0] / eigenvalues[2]
+            print(eccentricity)
             mesh_volume = abs(float(mesh.volume))
 
             new_dict = {"shape_class": str(dir),
@@ -318,52 +320,8 @@ def proof_alignment(folder):
         for filename in glob.iglob(f'{folder}/{dir}/*.off'):
             mesh = trimesh.load(filename, force='mesh')
             mesh = position(mesh)
-            n_points = len(mesh.vertices)
-            A = np.zeros((3, n_points))
-            A[0] = mesh.vertices.transpose()[0]
-            A[1] = mesh.vertices.transpose()[1]
-            A[2] = mesh.vertices.transpose()[2]
-            A_cov = np.cov(A)
-            eigenvalues, eigenvectors = np.linalg.eig(A_cov)
-            cos = abs(np.dot(eigenvectors[0], x_vector) / np.linalg.norm(eigenvectors[0]) / np.linalg.norm(x_vector))
-            cos_list.append(cos)
-            e1_e2 = np.cross(eigenvectors[0], eigenvectors[1])
-            E = np.zeros((3, 3))
-            E[0] = eigenvectors[0]
-            E[1] = eigenvectors[1]
-            E[2] = e1_e2
-            updated = np.dot(A.transpose(), E)
-            A_new = np.zeros((3, n_points))
-            A_new[0] = updated.transpose()[0]
-            A_new[1] = updated.transpose()[1]
-            A_new[2] = updated.transpose()[2]
-            A_cov_new = np.cov(A_new)
-            eigenvalues_new, eigenvectors_new = np.linalg.eig(A_cov_new)
-            cos_new = abs(
-                np.dot(eigenvectors_new[0], x_vector) / np.linalg.norm(eigenvectors_new[0]) / np.linalg.norm(x_vector))
-            cos_list_new.append(cos_new)
-    plt.hist(cos_list, rwidth=0.95, bins=15)
-    plt.title('Cosine of angle between a major eigenvector and the X axis')
-    plt.ylabel('frequency')
-    plt.xlabel('cosine')
-    plt.show()
-
-    plt.hist(cos_list_new, rwidth=0.95, bins=15)
-    plt.title('Cosine of angle between a new major eigenvector and the X axis')
-    plt.ylabel('frequency')
-    plt.xlabel('cosine')
-    plt.show()
-
-
-def proof_alignment(folder):
-    cos_list, cos_list_new = [], []
-    x_vector = np.array([1, 0, 0])
-    for dir in tqdm(os.listdir(folder)):
-        for filename in glob.iglob(f'{folder}/{dir}/*.off'):
-            mesh = trimesh.load(filename, force='mesh')
-            mesh = position(mesh)
-            mesh, eigenvectors = alignment(mesh)
-            mesh, eigenvectors_new = alignment(mesh)
+            mesh, eigenvectors, eigenvalues = alignment(mesh)
+            mesh, eigenvectors_new, eigenvalues_new = alignment(mesh)
             cos = abs(np.dot(eigenvectors[0], x_vector) / np.linalg.norm(eigenvectors[0]) / np.linalg.norm(x_vector))
             cos_list.append(cos)
             cos_new = abs(
