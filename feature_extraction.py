@@ -2,7 +2,6 @@ import numpy as np
 import random
 import trimesh
 import math
-import matplotlib.pyplot as plt
 
 FILE = "m107.off"
 trimesh.util.attach_to_log()
@@ -25,7 +24,7 @@ def a3(points):
 
 def d1(points, center):
     random_p = random.choice(list(points))
-    return distance(center, random_p)
+    return distance(np.array(center), np.array(random_p))
 
 
 def d2(points):
