@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 from scipy.spatial import ConvexHull
 from scipy.spatial.distance import cdist
-from property_descriptor_plots import get_data_for_plot
 import feature_extraction as f_e
 
 FILE = 'm107.off'
@@ -143,7 +142,6 @@ def save_ouput(fold):
                 num_faces = second_line.split()[1]
                 num_vert = second_line.split()[0]
 
-                # mesh = trimesh.load(filename, force='mesh')
                 p1 = np.array([mesh.center_mass[0], mesh.center_mass[1], mesh.center_mass[2]])
                 p2 = np.array([0, 0, 0])
                 dist = distance_two_point(p1, p2)
@@ -155,14 +153,8 @@ def save_ouput(fold):
                 norm_dist.append(dist)
                 long_boundbox.append(round(float(max(mesh.bounding_box.extents)), 5))
 
-            diam = diameter2(mesh)
-
-            # len_eigen_major = distance_two_point([0, 0, 0], eigenvectors[0])
-            # len_eigen_minor = distance_two_point([0, 0, 0], eigenvectors[2])
-            # eccentricity = len_eigen_major / len_eigen_minor
             eccentricity = eigenvalues[0] / eigenvalues[2]
             print(eccentricity)
-            mesh_volume = abs(float(mesh.volume))
 
             new_dict = {"shape_class": str(dir),
                         "num_verticles": int(num_vert),
@@ -173,9 +165,9 @@ def save_ouput(fold):
                         "path": filename,
                         "watertight": bool(mesh.is_watertight),
                         "area": float(mesh.area),
-                        "volume": mesh_volume,
-                        "compactness": float((mesh.area ** 3) / (36 * np.pi * (mesh_volume ** 2))),
-                        "diameter": float(diam),
+                        "volume": abs(float(mesh.volume)),
+                        "compactness": float((mesh.area ** 3) / (36 * np.pi * ((abs(float(mesh.volume))) ** 2))),
+                        "diameter": float(diameter2(mesh)),
                         "eccentricity": eccentricity,
                         "bound_box_volume": mesh.bounding_box_oriented.volume,
                         "a3": f_e.save_values_a3(mesh, 500),
@@ -188,18 +180,6 @@ def save_ouput(fold):
             i += 1
     print(f"Number of 3D objects in dataset: {i}")
     return output
-
-
-def diameter(mesh):
-    diam = 0
-    print(mesh.vertices[0])
-    for vertex in mesh.vertices:
-        a = np.array([vertex[0], vertex[1], vertex[2]])
-        for vertex2 in mesh.vertices:
-            b = np.array([vertex2[0], vertex2[1], vertex2[2]])
-            if distance_two_point(a, b) > diam:
-                diam = abs(np.linalg.norm(a - b))
-    return diam
 
 
 def diameter2(mesh):
@@ -253,9 +233,9 @@ def show_global_descrip_examples():
     mesh.show()
 
     # Examples for compactness descriptor
-    mesh = trimesh.load("LabeledDB_new/Glasses/58.off", force='mesh')
+    mesh = trimesh.load("LabeledDB_new/Vase/368.off", force='mesh')
     mesh.show()
-    mesh = trimesh.load("LabeledDB_new/Cup/25.off", force='mesh')
+    mesh = trimesh.load("LabeledDB_new/Cup/39.off", force='mesh')
     mesh.show()
 
     # Examples for diameter descriptor
@@ -265,9 +245,9 @@ def show_global_descrip_examples():
     mesh.show()
 
     # Examples for eccentricity descriptor
-    # mesh = trimesh.load("LabeledDB_new/Glasses/52.off", force='mesh')
+    # mesh = trimesh.load("LabeledDB_new/Vase/368.off", force='mesh')
     # mesh.show()
-    # mesh = trimesh.load("LabeledDB_new/Glasses/52.off", force='mesh')
+    # mesh = trimesh.load("LabeledDB_new/Cup/158.off", force='mesh')
     # mesh.show()
 
     # Examples for AABB box volume descriptor
@@ -275,9 +255,6 @@ def show_global_descrip_examples():
     mesh.show()
     mesh = trimesh.load("LabeledDB_new/Table/145.off", force='mesh')
     mesh.show()
-
-
-# show_global_descrip_examples()
 
 
 def before_and_after_scale_images():
@@ -310,7 +287,7 @@ def before_and_after_scale_images():
 
 
 # # uncomment the line below to save the excel file
-save_excel(DIR)
+#save_excel(DIR)
 
 
 def proof_alignment(folder):

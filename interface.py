@@ -1,3 +1,4 @@
+import trimesh
 from pywebio.input import *
 from pywebio.output import *
 from os import listdir
@@ -5,6 +6,9 @@ from os.path import isfile, join
 import random
 import pandas as pd
 import distances as dist
+from read_data import normalization_tool, diameter2
+import numpy as np
+
 
 excel_file = "normalized.xlsx"
 DIR = "LabeledDB_new"
@@ -48,8 +52,25 @@ def interface():
         put_table([('Distance', 'Path')] + dist)
 
     else:
-        link = file_upload("Select a file:")
-        print(link)
+        file = file_upload("Select a file:")
+        f = open('uploads/' + file['filename'], 'wb')
+        f.write(file['content'])
+
+        mesh = trimesh.load('uploads/' + file['filename'], force='mesh')
+        mesh, eigenvectors, eigenvalues = normalization_tool(mesh)
+        area = float(mesh.area)
+        volume = abs(float(mesh.volume))
+        compactness = float((mesh.area ** 3) / (36 * np.pi * (volume ** 2)))
+        diameter = float(diameter2(mesh))
+        eccentricity = eigenvalues[0] / eigenvalues[2]
+        values = [area, volume, compactness, diameter, eccentricity]
+        headers = ['area', 'volume', 'compactness', 'diameter', 'eccentricity']
+        put_table([headers, values])
+
+        df = pd.read_excel(excel_file, index_col=0)
+        dist = calculate_distances(values, df, "cos")
+        dist.sort(key=lambda tup: tup[0])
+        put_table([('Distance', 'Path')] + dist)
 
 
 if __name__ == '__main__':
