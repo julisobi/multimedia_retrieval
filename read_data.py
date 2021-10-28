@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 from scipy.spatial import ConvexHull
 from scipy.spatial.distance import cdist
-import feature_extraction as f_e
+import feature_extraction as fe
 
 FILE = 'm107.off'
 FILE2 = 'Bust_305.off'
@@ -154,7 +154,6 @@ def save_ouput(fold):
                 long_boundbox.append(round(float(max(mesh.bounding_box.extents)), 5))
 
             eccentricity = eigenvalues[0] / eigenvalues[2]
-            print(eccentricity)
 
             new_dict = {"shape_class": str(dir),
                         "num_verticles": int(num_vert),
@@ -170,16 +169,31 @@ def save_ouput(fold):
                         "diameter": float(diameter2(mesh)),
                         "eccentricity": eccentricity,
                         "bound_box_volume": mesh.bounding_box_oriented.volume,
-                        "a3": f_e.save_values_a3(mesh, 500),
-                        "d1": f_e.save_values_d1(mesh, 500),
-                        "d2": f_e.save_values_d2(mesh, 500),
-                        "d3": f_e.save_values_d3(mesh, 500),
-                        "d4": f_e.save_values_d4(mesh, 500)
+                        "a3": get_entries_from_histograms(mesh, "a3", 46),
+                        "d1": get_entries_from_histograms(mesh, "d1", 1000),
+                        "d2": get_entries_from_histograms(mesh, "d2", 100),
+                        "d3": get_entries_from_histograms(mesh, "d3", 46)
                         }
             output.append(new_dict)
             i += 1
     print(f"Number of 3D objects in dataset: {i}")
     return output
+
+
+def get_entries_from_histograms(mesh, descriptor, n):
+    if descriptor == "a3":
+        values = fe.a3_values(mesh, n)
+    elif descriptor == "d1":
+        values = fe.d1_values(mesh, n)
+    elif descriptor == "d2":
+        values = fe.d2_values(mesh, n)
+    elif descriptor == "d3":
+        values = fe.d3_values(mesh, n)
+    fig, axs = plt.subplots(figsize=(10, 5))
+    freq, bins, patches = axs.hist(values, bins=10, rwidth=0.8, color='dodgerblue', edgecolor='white')
+    # for f, b0, b1 in zip(freq, bins[:-1], bins[1:]):
+        # print(f'Bin {b0:.3f},{b1:.3f}: {f:.0f} entries')
+    return freq
 
 
 def diameter2(mesh):
@@ -216,7 +230,7 @@ def norm_plots(dist_list, bound_list):
 def save_excel(folder):
     out = save_ouput(folder)
     df = pd.DataFrame.from_dict(out)
-    df.to_excel('filter2.xlsx')
+    df.to_excel('test.xlsx')
 
 
 def show_global_descrip_examples():
@@ -287,7 +301,7 @@ def before_and_after_scale_images():
 
 
 # # uncomment the line below to save the excel file
-#save_excel(DIR)
+save_excel(DIR)
 
 
 def proof_alignment(folder):
