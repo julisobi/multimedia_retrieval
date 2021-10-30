@@ -172,7 +172,8 @@ def save_ouput(fold):
                         "a3": get_entries_from_histograms(mesh, "a3", 46),
                         "d1": get_entries_from_histograms(mesh, "d1", 1000),
                         "d2": get_entries_from_histograms(mesh, "d2", 100),
-                        "d3": get_entries_from_histograms(mesh, "d3", 46)
+                        "d3": get_entries_from_histograms(mesh, "d3", 46),
+                        "d4": get_entries_from_histograms(mesh, "d4", 26)
                         }
             output.append(new_dict)
             i += 1
@@ -189,6 +190,8 @@ def get_entries_from_histograms(mesh, descriptor, n):
         values = fe.d2_values(mesh, n)
     elif descriptor == "d3":
         values = fe.d3_values(mesh, n)
+    elif descriptor == "d4":
+        values = fe.d4_values(mesh, n)
     fig, axs = plt.subplots(figsize=(10, 5))
     freq, bins, patches = axs.hist(values, bins=10, rwidth=0.8, color='dodgerblue', edgecolor='white')
     # for f, b0, b1 in zip(freq, bins[:-1], bins[1:]):
@@ -227,10 +230,10 @@ def norm_plots(dist_list, bound_list):
     plt.show()
 
 
-def save_excel(folder):
+def save_excel(folder, new_file):
     out = save_ouput(folder)
     df = pd.DataFrame.from_dict(out)
-    df.to_excel('test.xlsx')
+    df.to_excel(new_file)
 
 
 def show_global_descrip_examples():
@@ -301,7 +304,7 @@ def before_and_after_scale_images():
 
 
 # # uncomment the line below to save the excel file
-save_excel(DIR)
+save_excel(DIR, "descriptors.xlsx")
 
 
 def proof_alignment(folder):
