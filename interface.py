@@ -13,6 +13,10 @@ from read_data import normalization_tool, diameter2
 import numpy as np
 
 
+weights = []
+weights.extend([0.04] * 5)  # weights of global descriptors
+weights.extend([0.02] * 40)  # weights of property descriptors
+
 excel_file = "normalized.xlsx"
 DIR = "LabeledDB_new"
 categories = ["Airplane", "Ant", "Armadillo", "Bearing", "Bird", "Bust",
@@ -20,15 +24,23 @@ categories = ["Airplane", "Ant", "Armadillo", "Bearing", "Bird", "Bust",
               "Mech", "Octopus", "Plier", "Table", "Teddy", "Vase"]
 
 
+def get_weights(gdw, pdw):
+    weights = []
+    weights.extend([gdw] * 5)  # weights of global descriptors
+    weights.extend([pdw] * 40)  # weights of property descriptors
+    return weights
+
+
 def calculate_distances(vector, df, distance):
     distances = []
     rows = df.values.tolist()
+    weights = get_weights(0.04, 0.02)
     for row in rows:
         row[0] = row[0].replace("\\", "/")
         if distance == "eucl":
-            distances.append((dist.euclidean_distance(vector, row[1:]), row[0]))
+            distances.append((dist.euclidean_distance(vector, row[1:], weights), row[0]))
         elif distance == "cos":
-            distances.append((dist.cosine_distance(vector, row[1:]), row[0]))
+            distances.append((dist.cosine_distance(vector, row[1:], weights), row[0]))
     return distances
 
 
@@ -52,7 +64,7 @@ def interface():
             file = select("Select file:", files)
             if file == "Random":
                 file = random_file
-            file_path = f"{path}\{file}"
+            file_path = f"{path}/{file}"
             df = pd.read_excel(excel_file, index_col=0)
             row = df.loc[(df['path'] == file_path)]
             headers = list(row)[1:]
@@ -95,6 +107,7 @@ def restart():
     print('restart')
     pywebio.output.clear('B')
     interface()
+
 
 if __name__ == '__main__':
     #pywebio.start_server(start_interface(), debug=True)

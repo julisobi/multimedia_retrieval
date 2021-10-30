@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-FILE = "test.xlsx"
+FILE = "descriptors.xlsx"
 NEW_FILE = "normalized.xlsx"
 
 

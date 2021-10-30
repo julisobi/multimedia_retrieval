@@ -304,7 +304,7 @@ def before_and_after_scale_images():
 
 
 # # uncomment the line below to save the excel file
-save_excel(DIR, "descriptors.xlsx")
+# save_excel(DIR, "descriptors.xlsx")
 
 
 def proof_alignment(folder):
