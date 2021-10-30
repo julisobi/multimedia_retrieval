@@ -41,6 +41,8 @@ def calculate_distances(vector, df, distance):
             distances.append((dist.euclidean_distance(vector, row[1:], weights), row[0]))
         elif distance == "cos":
             distances.append((dist.cosine_distance(vector, row[1:], weights), row[0]))
+        elif distance == "emd":
+            distances.append((dist.earth_movers_distance(vector, row[1:], weights), row[0]))
     return distances
 
 
@@ -73,9 +75,10 @@ def interface():
             pywebio.output.clear('B')
 
             put_table([headers, values])
-            dist = calculate_distances(values, df, "cos")
+            number = input("Choose the number of best-matching shapes to show:")
+            dist = calculate_distances(values, df, "emd")
             dist.sort(key=lambda tup: tup[0])
-            put_table([('Distance', 'Path')] + dist)
+            put_table([('Distance', 'Path')] + dist[1:int(number)+1])
             while not next:
                 time.sleep(1)
 

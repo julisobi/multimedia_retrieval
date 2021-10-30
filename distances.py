@@ -1,12 +1,6 @@
 from scipy.spatial import distance
 from scipy.stats import wasserstein_distance
 
-weights = []
-weights.extend([0.04] * 5)  # weights of global descriptors
-weights.extend([0.02] * 40)  # weights of property descriptors
-# print(weights)
-# print(sum(weights))  # check if sum of weights is equal 1
-
 
 def euclidean_distance(vector1, vector2, weights):
     we_vector1 = [a * b for a, b in zip(vector1, weights)]
