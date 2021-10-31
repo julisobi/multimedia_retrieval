@@ -5,6 +5,7 @@ from pywebio.input import *
 from pywebio.output import *
 from os import listdir
 from os.path import isfile, join
+from annoy import AnnoyIndex
 import random
 import pandas as pd
 
@@ -46,6 +47,27 @@ def calculate_distances(vector, df, distance):
     return distances
 
 
+def ann(df, filename, num_trees, k):
+    rows = df.values.tolist()
+    filenames = []
+    f = 45
+    t = AnnoyIndex(f, 'angular')
+    for i in range(len(rows)):
+        t.add_item(i, rows[i][1:])
+        filenames.append(rows[i][0])
+    i_file = filenames.index(filename)
+    t.build(num_trees)
+    t.save('meshes.ann')
+
+    u = AnnoyIndex(f, 'angular')
+    u.load('meshes.ann')  # super fast, will just mmap the file
+    knn = u.get_nns_by_item(i_file, k)
+    distances = [u.get_distance(i_file, el) for el in knn[1:]]
+    files = [filenames[i] for i in knn[1:]]
+    distances = [(distances[n], files[n]) for n in range(len(distances))]
+    return distances
+
+
 def start_interface():
     #while True:
     put_text("This is the interface for the Multimedia Retrieval project")
@@ -76,8 +98,9 @@ def interface():
 
             put_table([headers, values])
             number = input("Choose the number of best-matching shapes to show:")
-            dist = calculate_distances(values, df, "emd")
-            dist.sort(key=lambda tup: tup[0])
+            # dist = calculate_distances(values, df, "emd")
+            # dist.sort(key=lambda tup: tup[0])
+            dist = ann(df, file_path, 10, int(number)+1)
             put_table([('Distance', 'Path')] + dist[1:int(number)+1])
             while not next:
                 time.sleep(1)
