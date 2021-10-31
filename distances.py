@@ -1,6 +1,7 @@
 from scipy.spatial import distance
 from scipy.stats import wasserstein_distance
 
+WEIGHTS = [5, 5, 5, 5, 5, 15, 15, 15, 15, 15]
 
 def euclidean_distance(vector1, vector2, weights):
     we_vector1 = [a * b for a, b in zip(vector1, weights)]

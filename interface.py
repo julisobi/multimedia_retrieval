@@ -1,3 +1,5 @@
+from functools import partial
+
 import pywebio
 import time
 import trimesh
@@ -25,11 +27,22 @@ categories = ["Airplane", "Ant", "Armadillo", "Bearing", "Bird", "Bust",
               "Mech", "Octopus", "Plier", "Table", "Teddy", "Vase"]
 
 
+trimesh.util.attach_to_log()
+
+
+def view_mesh(file):
+    print("File", file)
+    mesh = trimesh.load(file, force='mesh')
+    mesh.show()
+
+
+
 def get_weights(gdw, pdw):
     weights = []
     weights.extend([gdw] * 5)  # weights of global descriptors
     weights.extend([pdw] * 40)  # weights of property descriptors
     return weights
+
 
 
 def calculate_distances(vector, df, distance):
@@ -101,7 +114,11 @@ def interface():
             # dist = calculate_distances(values, df, "emd")
             # dist.sort(key=lambda tup: tup[0])
             dist = ann(df, file_path, 10, int(number)+1)
-            put_table([('Distance', 'Path')] + dist[1:int(number)+1])
+            new_dist = []
+            for item in dist:
+                new_item = (item[0], item[1], put_button("Visualize mesh", onclick=partial(view_mesh, file=item[1]), color='success', outline=True))
+                new_dist.append(new_item)
+            put_table([('Distance', 'Path', 'Open View')] + new_dist[0:int(number)+1])
             while not next:
                 time.sleep(1)
 
@@ -122,11 +139,24 @@ def interface():
 
             pywebio.output.clear('B')
 
-            put_table([headers, values])
             df = pd.read_excel(excel_file, index_col=0)
-            dist = calculate_distances(values, df, "cos")
-            dist.sort(key=lambda tup: tup[0])
-            put_table([('Distance', 'Path')] + dist)
+            put_table([headers, values])
+            number = input("Choose the number of best-matching shapes to show:")
+            # dist = calculate_distances(values, df, "emd")
+            # dist.sort(key=lambda tup: tup[0])
+            dist = ann(df, 'uploads/' + file['filename'], 10, int(number) + 1)
+            new_dist = []
+            for item in dist:
+                new_item = (item[0], item[1],
+                            put_button("Visualize mesh", onclick=partial(view_mesh, file=item[1]), color='success',
+                                       outline=True))
+                new_dist.append(new_item)
+            put_table([('Distance', 'Path', 'Open View')] + new_dist[0:int(number) + 1])
+            # put_table([headers, values])
+            # df = pd.read_excel(excel_file, index_col=0)
+            # dist = calculate_distances(values, df, "cos")
+            # dist.sort(key=lambda tup: tup[0])
+            # put_table([('Distance', 'Path')] + dist)
 
 
 def restart():
