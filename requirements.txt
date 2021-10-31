@@ -8,3 +8,4 @@ openpyxl
 pandas
 pymeshlab
 pywebio
+annoy
