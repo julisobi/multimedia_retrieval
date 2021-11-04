@@ -1,16 +1,8 @@
 import re
-
 import scipy.stats as stats
-import os
-import glob
 import matplotlib.pyplot as plt
 import pandas as pd
 import json
-import numpy as np
-from tqdm import tqdm
-import feature_extraction as fe
-
-DIR = 'LabeledDB_new'
 
 
 def normalize_histogram_vals(hist_vals):
@@ -20,34 +12,10 @@ def normalize_histogram_vals(hist_vals):
     return hist_vals
 
 
-def show_plots(data):
-    class_names = ["airplane", "ant", "armadillo", "bearing", "bird", "bust", "chair", "cup", "fish", "fourleg",
-                   "glasses", "hand", "human", "mech", "octopus", "plier", "table", "teddy", "vase"]
-    fig, axs = plt.subplots(4, 5)
-
-    for i in range(19):
-        class_meshes = data[i]
-        y = i % 5
-        x = int((i - y) / 5)
-
-        for mesh in class_meshes:
-            mesh = normalize_histogram_vals(mesh)
-            density = stats.gaussian_kde(mesh)
-            n, p, _ = plt.hist(mesh, histtype=u'step', density=True)
-            axs[x, y].plot(p, density(p))
-
-        axs[x, y].set_title(class_names[i])
-
-    fig.tight_layout()
-    plt.show()
-
-
 def get_data_for_plot(descriptor: str):
     data_dict = pd.read_excel("filter2.xlsx", None)
     column_name = descriptor
     df = data_dict["Sheet1"]
-    print(df['a3'])
-
     descriptor_data = df[column_name].values
     return descriptor_data
 
