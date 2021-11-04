@@ -43,18 +43,13 @@ def get_weights(gdw, pdw):
     return weights
 
 
-def calculate_distances(vector, df, distance):
+def calculate_distances(vector, df):
     distances = []
     rows = df.values.tolist()
-    weights = get_weights(0.04, 0.02)
+    # weights = get_weights(0.04, 0.02)
     for row in rows:
         row[0] = row[0].replace("\\", "/")
-        if distance == "eucl":
-            distances.append((dist.euclidean_distance(vector, row[1:], weights), row[0]))
-        elif distance == "cos":
-            distances.append((dist.cosine_distance(vector, row[1:], weights), row[0]))
-        elif distance == "emd":
-            distances.append((dist.earth_movers_distance(vector, row[1:], weights), row[0]))
+        distances.append((dist.combine_distance(vector, row[1:]), row[0]))
     return distances
 
 
@@ -109,11 +104,11 @@ def interface():
 
             put_table([headers, values])
             number = input("Choose the number of best-matching shapes to show:")
-            # dist = calculate_distances(values, df, "emd")
-            # dist.sort(key=lambda tup: tup[0])
-            dist = ann(df, file_path, 10, int(number)+1)
+            dist = calculate_distances(values, df)
+            dist.sort(key=lambda tup: tup[0])
+            # dist = ann(df, file_path, 10, int(number)+1)
             new_dist = []
-            for item in dist:
+            for item in dist[1:int(number) + 1]:
                 new_item = (item[0], item[1], put_button("Visualize mesh", onclick=partial(view_mesh, file=item[1]), color='success', outline=True))
                 new_dist.append(new_item)
             put_table([('Distance', 'Path', 'Open View')] + new_dist[0:int(number)+1])
@@ -152,18 +147,13 @@ def interface():
             df = pd.read_excel(excel_file, index_col=0)
             put_table([headers, values])
             number = input("Choose the number of best-matching shapes to show:")
-            dist = calculate_distances(values, df, "emd")
+            dist = calculate_distances(values, df)
             dist.sort(key=lambda tup: tup[0])
             new_dist = []
             for item in dist[:int(number)]:
                 new_item = (item[0], item[1], put_button("Visualize mesh", onclick=partial(view_mesh, file=item[1]), color='success', outline=True))
                 new_dist.append(new_item)
             put_table([('Distance', 'Path', 'Open View')] + new_dist)
-            # put_table([headers, values])
-            # df = pd.read_excel(excel_file, index_col=0)
-            # dist = calculate_distances(values, df, "cos")
-            # dist.sort(key=lambda tup: tup[0])
-            # put_table([('Distance', 'Path')] + dist)
 
 
 def restart():
