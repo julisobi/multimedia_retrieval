@@ -76,7 +76,7 @@ def ann(df, filename, num_trees, k):
 
 def start_interface():
     #while True:
-    put_text("This is the interface for the Multimedia Retrieval project")
+    put_text("This is the interface for the Multimedia Retrieval project - by J. Sobiczewska and A. Vermast")
     put_button("Restart and try another mesh", onclick=lambda: restart(), color='success', outline=True)
     interface()
     pywebio.session.hold()
@@ -104,9 +104,14 @@ def interface():
 
             put_table([headers, values])
             number = input("Choose the number of best-matching shapes to show:")
+
+            # Use the next two lines for without ANN
             dist = calculate_distances(values, df)
             dist.sort(key=lambda tup: tup[0])
+
+            # Use the next line for with ANN
             # dist = ann(df, file_path, 10, int(number)+1)
+
             new_dist = []
             for item in dist[1:int(number) + 1]:
                 new_item = (item[0], item[1], put_button("Visualize mesh", onclick=partial(view_mesh, file=item[1]), color='success', outline=True))
