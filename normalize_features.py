@@ -25,7 +25,6 @@ def save_output(excel_file):
     compactness = normalize_single_feature(df['compactness'].to_numpy())
     diameter = normalize_single_feature(df['diameter'].to_numpy())
     eccentricity = normalize_single_feature(df['eccentricity'].to_numpy())
-    a3_1 = [value.replace('[', '').replace(']', '').replace('.', '').split()[0] for value in df['a3'].to_numpy()]
 
     new_df = pd.DataFrame({'path': df['path'].to_numpy(),
                            'area': area,

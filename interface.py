@@ -12,7 +12,7 @@ import random
 import pandas as pd
 
 import distances as dist
-from read_data import normalization_tool, diameter2
+from read_data import normalization_tool, diameter2, get_entries_from_histograms
 import numpy as np
 
 
@@ -36,13 +36,11 @@ def view_mesh(file):
     mesh.show()
 
 
-
 def get_weights(gdw, pdw):
     weights = []
     weights.extend([gdw] * 5)  # weights of global descriptors
     weights.extend([pdw] * 40)  # weights of property descriptors
     return weights
-
 
 
 def calculate_distances(vector, df, distance):
@@ -134,7 +132,19 @@ def interface():
             compactness = float((mesh.area ** 3) / (36 * np.pi * (volume ** 2)))
             diameter = float(diameter2(mesh))
             eccentricity = eigenvalues[0] / eigenvalues[2]
+            a3 = get_entries_from_histograms(mesh, "a3", 46)
+            a3_normalized = [int(val) / 46**3 for val in a3]
+            d1 = get_entries_from_histograms(mesh, "d1", 1000)
+            d1_normalized = [int(val) / 1000 for val in d1]
+            d2 = get_entries_from_histograms(mesh, "d2", 100)
+            d2_normalized = [int(val) / 10000 for val in d2]
+            d3 = get_entries_from_histograms(mesh, "d3", 46)
+            d3_normalized = [int(val) / 46**3 for val in d3]
             values = [area, volume, compactness, diameter, eccentricity]
+            values.extend(a3_normalized)
+            values.extend(d1_normalized)
+            values.extend(d2_normalized)
+            values.extend(d3_normalized)
             headers = ['area', 'volume', 'compactness', 'diameter', 'eccentricity']
 
             pywebio.output.clear('B')
@@ -142,16 +152,13 @@ def interface():
             df = pd.read_excel(excel_file, index_col=0)
             put_table([headers, values])
             number = input("Choose the number of best-matching shapes to show:")
-            # dist = calculate_distances(values, df, "emd")
-            # dist.sort(key=lambda tup: tup[0])
-            dist = ann(df, 'uploads/' + file['filename'], 10, int(number) + 1)
+            dist = calculate_distances(values, df, "emd")
+            dist.sort(key=lambda tup: tup[0])
             new_dist = []
-            for item in dist:
-                new_item = (item[0], item[1],
-                            put_button("Visualize mesh", onclick=partial(view_mesh, file=item[1]), color='success',
-                                       outline=True))
+            for item in dist[:int(number)]:
+                new_item = (item[0], item[1], put_button("Visualize mesh", onclick=partial(view_mesh, file=item[1]), color='success', outline=True))
                 new_dist.append(new_item)
-            put_table([('Distance', 'Path', 'Open View')] + new_dist[0:int(number) + 1])
+            put_table([('Distance', 'Path', 'Open View')] + new_dist)
             # put_table([headers, values])
             # df = pd.read_excel(excel_file, index_col=0)
             # dist = calculate_distances(values, df, "cos")
