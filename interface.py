@@ -7,12 +7,11 @@ from pywebio.input import *
 from pywebio.output import *
 from os import listdir
 from os.path import isfile, join
-from annoy import AnnoyIndex
 import random
 import pandas as pd
 
-import distances as dist
-from read_data import normalization_tool, diameter2, get_entries_from_histograms
+import distances
+from read_data import normalization_tool, diameter2, get_entries_from_histograms, view_mesh
 import numpy as np
 
 
@@ -30,48 +29,11 @@ categories = ["Airplane", "Ant", "Armadillo", "Bearing", "Bird", "Bust",
 trimesh.util.attach_to_log()
 
 
-def view_mesh(file):
-    print("File", file)
-    mesh = trimesh.load(file, force='mesh')
-    mesh.show()
-
-
 def get_weights(gdw, pdw):
     weights = []
     weights.extend([gdw] * 5)  # weights of global descriptors
     weights.extend([pdw] * 40)  # weights of property descriptors
     return weights
-
-
-def calculate_distances(vector, df):
-    distances = []
-    rows = df.values.tolist()
-    # weights = get_weights(0.04, 0.02)
-    for row in rows:
-        row[0] = row[0].replace("\\", "/")
-        distances.append((dist.combine_distance(vector, row[1:]), row[0]))
-    return distances
-
-
-def ann(df, filename, num_trees, k):
-    rows = df.values.tolist()
-    filenames = []
-    f = 45
-    t = AnnoyIndex(f, 'angular')
-    for i in range(len(rows)):
-        t.add_item(i, rows[i][1:])
-        filenames.append(rows[i][0])
-    i_file = filenames.index(filename)
-    t.build(num_trees)
-    t.save('meshes.ann')
-
-    u = AnnoyIndex(f, 'angular')
-    u.load('meshes.ann')  # super fast, will just mmap the file
-    knn = u.get_nns_by_item(i_file, k)
-    distances = [u.get_distance(i_file, el) for el in knn[1:]]
-    files = [filenames[i] for i in knn[1:]]
-    distances = [(distances[n], files[n]) for n in range(len(distances))]
-    return distances
 
 
 def start_interface():
@@ -106,11 +68,11 @@ def interface():
             number = input("Choose the number of best-matching shapes to show:")
 
             # Use the next two lines for without ANN
-            dist = calculate_distances(values, df)
-            dist.sort(key=lambda tup: tup[0])
+            # dist = distances.calculate_distances(values, df)
+            # dist.sort(key=lambda tup: tup[0])
 
             # Use the next line for with ANN
-            # dist = ann(df, file_path, 10, int(number)+1)
+            dist = distances.ann(df, file_path, 10, int(number)+1)
 
             new_dist = []
             for item in dist[1:int(number) + 1]:
@@ -152,7 +114,7 @@ def interface():
             df = pd.read_excel(excel_file, index_col=0)
             put_table([headers, values])
             number = input("Choose the number of best-matching shapes to show:")
-            dist = calculate_distances(values, df)
+            dist = distances.calculate_distances(values, df)
             dist.sort(key=lambda tup: tup[0])
             new_dist = []
             for item in dist[:int(number)]:

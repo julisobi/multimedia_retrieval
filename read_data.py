@@ -16,7 +16,8 @@ VOLUME = 'V1_141_chair.off'
 trimesh.util.attach_to_log()
 
 
-def view_3d(file):
+def view_mesh(file):
+    print(f"File {file}")
     mesh = trimesh.load(file, force='mesh')
     mesh.show()
 

@@ -1,5 +1,6 @@
 from scipy.spatial import distance
 from scipy.stats import wasserstein_distance
+from annoy import AnnoyIndex
 from normalize_features import normalize_single_feature
 
 WEIGHTS = [5, 5, 5, 5, 5, 15, 15, 15, 15, 15]
@@ -38,3 +39,35 @@ def combine_distance(vector1, vector2):
     dist5 = earth_movers_distance(histd3_vector1, histd3_vector2)
     avg_dist = (dist1 + dist2 + dist3 + dist4 + dist5) / 5
     return avg_dist
+
+
+def calculate_distances(vector, df):
+    distances = []
+    rows = df.values.tolist()
+    # weights = get_weights(0.04, 0.02)
+    for row in rows:
+        row[0] = row[0].replace("\\", "/")
+        distances.append((combine_distance(vector, row[1:]), row[0]))
+    return distances
+
+
+def ann(df, filename, num_trees, k):
+    rows = df.values.tolist()
+    filenames = []
+    f = 45
+    t = AnnoyIndex(f, 'angular')
+    for i in range(len(rows)):
+        t.add_item(i, rows[i][1:])
+        filenames.append(rows[i][0])
+    i_file = filenames.index(filename)
+    t.build(num_trees)
+    t.save('meshes.ann')
+
+    u = AnnoyIndex(f, 'angular')
+    u.load('meshes.ann')  # super fast, will just mmap the file
+    knn = u.get_nns_by_item(i_file, k)
+    distances = [u.get_distance(i_file, el) for el in knn]
+    files = [filenames[i] for i in knn]
+    distances = [(distances[n], files[n]) for n in range(len(distances))]
+    return distances
+

@@ -9,3 +9,4 @@ pandas
 pymeshlab
 pywebio
 annoy
+sklearn
