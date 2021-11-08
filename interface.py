@@ -96,8 +96,8 @@ def interface():
             eccentricity = eigenvalues[0] / eigenvalues[2]
             a3 = get_entries_from_histograms(mesh, "a3", 46)
             a3_normalized = [int(val) / 46**3 for val in a3]
-            d1 = get_entries_from_histograms(mesh, "d1", 1000)
-            d1_normalized = [int(val) / 1000 for val in d1]
+            d1 = get_entries_from_histograms(mesh, "d1", 7000)
+            d1_normalized = [int(val) / 7000 for val in d1]
             d2 = get_entries_from_histograms(mesh, "d2", 100)
             d2_normalized = [int(val) / 10000 for val in d2]
             d3 = get_entries_from_histograms(mesh, "d3", 46)

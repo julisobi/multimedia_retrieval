@@ -11,6 +11,8 @@ import feature_extraction as fe
 
 FILE = 'm107.off'
 FILE2 = 'Bust_305.off'
+FILE3 = 'm99.off'
+FILE4 = 'm317.off'
 DIR = 'LabeledDB_new'
 VOLUME = 'V1_141_chair.off'
 trimesh.util.attach_to_log()
