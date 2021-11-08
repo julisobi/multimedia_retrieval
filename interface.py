@@ -68,11 +68,11 @@ def interface():
             number = input("Choose the number of best-matching shapes to show:")
 
             # Use the next two lines for without ANN
-            # dist = distances.calculate_distances(values, df)
-            # dist.sort(key=lambda tup: tup[0])
+            dist = distances.calculate_distances(values, df)
+            dist.sort(key=lambda tup: tup[0])
 
             # Use the next line for with ANN
-            dist = distances.ann(df, file_path, 10, int(number)+1)
+            #dist = distances.ann(df, file_path, 10, int(number)+1)
 
             new_dist = []
             for item in dist[1:int(number) + 1]:
