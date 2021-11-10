@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 from numpy import mean, quantile
-from read_data import view_3d
+from read_data import view_mesh
 
 excel_file = "filter.xlsx"
 
@@ -99,10 +99,10 @@ def show_average_shape(file):
     paths = list(data['path'])
     nearest_vert, v_index, diff_vert, nearest_face, f_index, diff_face = get_nearest_val(file)
     if f_index == v_index:
-        view_3d(paths[f_index])
+        view_mesh(paths[f_index])
     else:
-        view_3d(paths[f_index])
-        view_3d(paths[v_index])
+        view_mesh(paths[f_index])
+        view_mesh(paths[v_index])
 
 
 def show_outlier_shape(file):
@@ -110,10 +110,10 @@ def show_outlier_shape(file):
     paths = list(data['path'])
     outl_vert, v_index, diff_vert, outl_face, f_index, diff_face = get_outlier_val(file)
     if f_index == v_index:
-        view_3d(paths[f_index])
+        view_mesh(paths[f_index])
     else:
-        view_3d(paths[f_index])
-        view_3d(paths[v_index])
+        view_mesh(paths[f_index])
+        view_mesh(paths[v_index])
 
 
 def find_outliers(file):
