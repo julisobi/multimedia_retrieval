@@ -13,7 +13,7 @@ def evaluate_meshes(excel_file):
         category = file.split("/")[1]
         if file == "LabeledDB_new/Hand/subs_183.off":
             continue
-        distances = ann(df, file, 10, 20)
+        distances = ann(df, file, 15, 20)
         categories = [tup[1].split("/")[1] for tup in distances]
         y_pred = [1 if cat == category else 0 for cat in categories]
         TP = y_pred.count(1)
