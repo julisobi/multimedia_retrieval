@@ -61,12 +61,8 @@ def ann(df, filename, num_trees, k):
         filenames.append(rows[i][0])
     i_file = filenames.index(filename)
     t.build(num_trees)
-    t.save('meshes.ann')
-
-    u = AnnoyIndex(f, 'angular')
-    u.load('meshes.ann')  # super fast, will just mmap the file
-    knn = u.get_nns_by_item(i_file, k)
-    distances = [u.get_distance(i_file, el) for el in knn]
+    knn = t.get_nns_by_item(i_file, k)
+    distances = [t.get_distance(i_file, el) for el in knn]
     files = [filenames[i] for i in knn]
     distances = [(distances[n], files[n]) for n in range(len(distances))]
     return distances
