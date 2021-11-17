@@ -1,4 +1,9 @@
 import numpy as np
+import glob
+import trimesh
+import os
+from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 # -----------------------------------------------------------------------------------------------------------
 # This file contains the functions responsible for normalizing the meshes.
@@ -27,7 +32,6 @@ def position(mesh):
 
 
 def alignment(mesh):
-    # numpy.linalg.eigvals?
     n_points = len(mesh.vertices)
     A = np.zeros((3, n_points))
     A[0] = mesh.vertices.transpose()[0]
@@ -87,3 +91,30 @@ def scale(mesh):
 
     mesh.apply_transform(scale_matrix)
     return mesh
+
+
+def proof_alignment(folder):
+    cos_list, cos_list_new = [], []
+    x_vector = np.array([1, 0, 0])
+    for dir in tqdm(os.listdir(folder)):
+        for filename in glob.iglob(f'{folder}/{dir}/*.off'):
+            mesh = trimesh.load(filename, force='mesh')
+            mesh = position(mesh)
+            mesh, eigenvectors, eigenvalues = alignment(mesh)
+            mesh, eigenvectors_new, eigenvalues_new = alignment(mesh)
+            cos = abs(np.dot(eigenvectors[0], x_vector) / np.linalg.norm(eigenvectors[0]) / np.linalg.norm(x_vector))
+            cos_list.append(cos)
+            cos_new = abs(
+                np.dot(eigenvectors_new[0], x_vector) / np.linalg.norm(eigenvectors_new[0]) / np.linalg.norm(x_vector))
+            cos_list_new.append(cos_new)
+    plt.hist(cos_list, rwidth=0.95, bins=15)
+    plt.title('Cosine of angle between a major eigenvector and the X axis')
+    plt.ylabel('frequency')
+    plt.xlabel('cosine')
+    plt.show()
+
+    plt.hist(cos_list_new, rwidth=0.95, bins=15)
+    plt.title('Cosine of angle between a new major eigenvector and the X axis')
+    plt.ylabel('frequency')
+    plt.xlabel('cosine')
+    plt.show()
