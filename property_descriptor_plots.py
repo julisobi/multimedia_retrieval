@@ -3,6 +3,7 @@ import scipy.stats as stats
 import matplotlib.pyplot as plt
 import pandas as pd
 import json
+import numpy as np
 
 
 def normalize_histogram_vals(hist_vals):
@@ -76,16 +77,17 @@ def total_plots_new(descriptor: str):
         #plot_values = normalize_histogram_vals(plot_values)
 
         axs[x, y].plot(plot_values)
-
+        #axs[x, y].set_xticks([2, 4, 6, 8, 10])
         axs[x, y].set_title(class_names[class_index])
 
     fig.tight_layout()
+
     plt.show()
 
 
 # MAIN
 # total_plots_new("a3")
-# total_plots_new("d1")
+total_plots_new("d1")
 # total_plots_new("d2")
 # total_plots_new("d3")
 # total_plots_new("d4")
