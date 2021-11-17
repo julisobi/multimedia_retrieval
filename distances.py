@@ -1,7 +1,10 @@
 from scipy.spatial import distance
 from scipy.stats import wasserstein_distance
 from annoy import AnnoyIndex
-from normalize_features import normalize_single_feature
+
+# -----------------------------------------------------------------------------------------------------------
+# This file contains different methods of computing distances between features of the mesh feature vectors.
+# -----------------------------------------------------------------------------------------------------------
 
 WEIGHTS = [5, 5, 5, 5, 5, 15, 15, 15, 15, 15]
 
@@ -44,7 +47,6 @@ def combine_distance(vector1, vector2):
 def calculate_distances(vector, df):
     distances = []
     rows = df.values.tolist()
-    # weights = get_weights(0.04, 0.02)
     for row in rows:
         row[0] = row[0].replace("\\", "/")
         distances.append((combine_distance(vector, row[1:]), row[0]))

@@ -6,7 +6,7 @@ import json
 
 
 def normalize_histogram_vals(hist_vals):
-    sample_amount = len(hist_vals)
+    sample_amount = sum(hist_vals)
     for index in range(len(hist_vals)):
         hist_vals[index] = hist_vals[index] / sample_amount
     return hist_vals
@@ -70,9 +70,11 @@ def total_plots_new(descriptor: str):
 
         hist_values_cell = df.iloc[row_index][descriptor]
         # Somehow, it can only read the value in the Excel cell out as a string, which is a weird point separated
-        # format, so I use regex to extract the numbers. into a list.
+        # format, so I use regex to extract the numbers into a list.
         new = re.findall("\d+", hist_values_cell)
         plot_values = [int(x) for x in new]
+        #plot_values = normalize_histogram_vals(plot_values)
+
         axs[x, y].plot(plot_values)
 
         axs[x, y].set_title(class_names[class_index])

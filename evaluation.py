@@ -4,6 +4,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+# -----------------------------------------------------------------------------------------------------------
+# This file contains functions to compute evaluation metrics and plot those values.
+# -----------------------------------------------------------------------------------------------------------
+
+
 def evaluate_meshes(excel_file):
     total_acc, total_prec, total_recc = 0, 0, 0
     acc_prec_recc_cat_list = []
@@ -27,25 +32,44 @@ def evaluate_meshes(excel_file):
         total_prec += prec
         total_recc += rec
         acc_prec_recc_cat_list.append((acc, prec, rec, category))
-    print(f"Airplane accuracy, precision, recall: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Airplane']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Airplane']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Airplane']) / 20}")
-    print(f"Ant accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Ant']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Ant']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Ant']) / 20}")
-    print(f"Armadillo accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Armadillo']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Armadillo']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Armadillo']) / 20}")
-    print(f"Bearing accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Bearing']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Bearing']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Bearing']) / 20}")
-    print(f"Bird accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Bird']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Bird']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Bird']) / 20}")
-    print(f"Bust accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Bust']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Bust']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Bust']) / 20}")
-    print(f"Chair accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Chair']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Chair']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Chair']) / 20}")
-    print(f"Cup accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Cup']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Cup']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Cup']) / 20}")
-    print(f"Fish accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Fish']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Fish']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Fish']) / 20}")
-    print(f"FourLeg accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'FourLeg']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'FourLeg']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'FourLeg']) / 20}")
-    print(f"Glasses accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Glasses']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Glasses']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Glasses']) / 20}")
-    print(f"Hand accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Hand']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Hand']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Hand']) / 20}")
-    print(f"Human accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Human']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Human']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Human']) / 20}")
-    print(f"Mech accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Mech']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Mech']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Mech']) / 20}")
-    print(f"Octopus accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Octopus']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Octopus']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Octopus']) / 20}")
-    print(f"Plier accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Plier']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Plier']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Plier']) / 20}")
-    print(f"Table accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Table']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Table']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Table']) / 20}")
-    print(f"Teddy accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Teddy']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Teddy']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Teddy']) / 20}")
-    print(f"Vase accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Vase']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Vase']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Vase']) / 20}")
+    print(
+        f"Airplane accuracy, precision, recall: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Airplane']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Airplane']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Airplane']) / 20}")
+    print(
+        f"Ant accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Ant']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Ant']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Ant']) / 20}")
+    print(
+        f"Armadillo accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Armadillo']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Armadillo']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Armadillo']) / 20}")
+    print(
+        f"Bearing accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Bearing']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Bearing']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Bearing']) / 20}")
+    print(
+        f"Bird accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Bird']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Bird']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Bird']) / 20}")
+    print(
+        f"Bust accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Bust']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Bust']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Bust']) / 20}")
+    print(
+        f"Chair accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Chair']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Chair']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Chair']) / 20}")
+    print(
+        f"Cup accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Cup']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Cup']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Cup']) / 20}")
+    print(
+        f"Fish accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Fish']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Fish']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Fish']) / 20}")
+    print(
+        f"FourLeg accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'FourLeg']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'FourLeg']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'FourLeg']) / 20}")
+    print(
+        f"Glasses accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Glasses']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Glasses']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Glasses']) / 20}")
+    print(
+        f"Hand accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Hand']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Hand']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Hand']) / 20}")
+    print(
+        f"Human accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Human']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Human']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Human']) / 20}")
+    print(
+        f"Mech accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Mech']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Mech']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Mech']) / 20}")
+    print(
+        f"Octopus accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Octopus']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Octopus']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Octopus']) / 20}")
+    print(
+        f"Plier accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Plier']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Plier']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Plier']) / 20}")
+    print(
+        f"Table accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Table']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Table']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Table']) / 20}")
+    print(
+        f"Teddy accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Teddy']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Teddy']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Teddy']) / 20}")
+    print(
+        f"Vase accuracy: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Vase']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Vase']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Vase']) / 20}")
 
     print(f"Total accuracy: {total_acc / 380}")
     print(f"Total precision: {total_prec / 380}")
@@ -60,7 +84,9 @@ def histograms(results_list):
     acc, prec, rec = [], [], []
     results = []
     for cat in categories:
-        results.append((cat, sum([e[0] for e in results_list if e[3] == cat]) / 20, sum([e[1] for e in results_list if e[3] == cat]) / 20, sum([e[2] for e in results_list if e[3] == cat]) / 20))
+        results.append((cat, sum([e[0] for e in results_list if e[3] == cat]) / 20,
+                        sum([e[1] for e in results_list if e[3] == cat]) / 20,
+                        sum([e[2] for e in results_list if e[3] == cat]) / 20))
         acc.append(sum([e[0] for e in results_list if e[3] == cat]) / 20)
         prec.append(sum([e[1] for e in results_list if e[3] == cat]) / 20)
         rec.append(sum([e[2] for e in results_list if e[3] == cat]) / 20)
@@ -85,5 +111,6 @@ def histograms(results_list):
     plt.show()
 
 
+# MAIN
 # evaluate_meshes("normalized.xlsx")
-histograms(evaluate_meshes("normalized.xlsx"))
+# histograms(evaluate_meshes("normalized.xlsx"))

@@ -3,8 +3,11 @@ import random
 import trimesh
 import math
 
-FILE = "m107.off"
 trimesh.util.attach_to_log()
+
+# -----------------------------------------------------------------------------------------------------------
+# This file contains functions compute the property descriptors.
+# -----------------------------------------------------------------------------------------------------------
 
 
 def distance(p1, p2):
@@ -13,7 +16,7 @@ def distance(p1, p2):
     return dist
 
 
-def a3(points): 
+def a3(points):
     # random_points = random.sample(list(points), 3)
     # ba = np.array(random_points[0]) - np.array(random_points[1])
     # bc = np.array(random_points[2]) - np.array(random_points[1])
@@ -37,13 +40,11 @@ def d1(points, center):
 def d2(points):
     random.shuffle(points)
     idx = random.sample(range(len(points)), 2)
-    # random_points = random.sample(list(points), 2)
     dist = distance(np.array(points[idx[0]]), np.array(points[idx[1]]))
     return dist
 
 
 def d3(points):
-    # random_points = random.sample(list(points), 3)
     random.shuffle(points)
     idx = random.sample(range(len(points)), 3)
     dist1 = distance(np.array(points[idx[0]]), np.array(points[idx[1]]))
@@ -55,7 +56,6 @@ def d3(points):
 
 
 def d4(points):
-    # random_points = random.sample(list(points), 4)
     random.shuffle(points)
     idx = random.sample(range(len(points)), 4)
     ad = np.array(points[idx[0]]) - np.array(points[idx[3]])

@@ -14,6 +14,9 @@ import distances
 from read_data import normalization_tool, diameter2, get_entries_from_histograms, view_mesh
 import numpy as np
 
+# -----------------------------------------------------------------------------------------------------------
+# Run this file to start the webinterface with the working multimedia retrieval system.
+# -----------------------------------------------------------------------------------------------------------
 
 weights = []
 weights.extend([0.04] * 5)  # weights of global descriptors
@@ -24,7 +27,6 @@ DIR = "LabeledDB_new"
 categories = ["Airplane", "Ant", "Armadillo", "Bearing", "Bird", "Bust",
               "Chair", "Cup", "Fish", "FourLeg", "Glasses", "Hand", "Human",
               "Mech", "Octopus", "Plier", "Table", "Teddy", "Vase"]
-
 
 trimesh.util.attach_to_log()
 
@@ -37,7 +39,6 @@ def get_weights(gdw, pdw):
 
 
 def start_interface():
-    #while True:
     put_text("This is the interface for the Multimedia Retrieval project - by J. Sobiczewska and A. Vermast")
     put_button("Restart and try another mesh", onclick=lambda: restart(), color='success', outline=True)
     interface()

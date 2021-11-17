@@ -1,10 +1,9 @@
 import matplotlib.pyplot as plt
 import pandas as pd
-import numpy as np
 from numpy import mean, quantile
 from read_data import view_mesh
 
-excel_file = "filter.xlsx"
+excel_file = "filter2.xlsx"
 
 
 def get_list_from_excel(file):
