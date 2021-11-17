@@ -6,8 +6,6 @@ from annoy import AnnoyIndex
 # This file contains different methods of computing distances between features of the mesh feature vectors.
 # -----------------------------------------------------------------------------------------------------------
 
-WEIGHTS = [5, 5, 5, 5, 5, 15, 15, 15, 15, 15]
-
 
 def euclidean_distance(vector1, vector2):
     euc_d = distance.euclidean(vector1, vector2)
@@ -57,7 +55,7 @@ def ann(df, filename, num_trees, k):
     rows = df.values.tolist()
     filenames = []
     f = 45
-    t = AnnoyIndex(f, 'angular')
+    t = AnnoyIndex(f, 'manhattan')
     for i in range(len(rows)):
         t.add_item(i, rows[i][1:])
         filenames.append(rows[i][0])
@@ -68,4 +66,3 @@ def ann(df, filename, num_trees, k):
     files = [filenames[i] for i in knn]
     distances = [(distances[n], files[n]) for n in range(len(distances))]
     return distances
-

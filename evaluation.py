@@ -1,7 +1,8 @@
 import pandas as pd
-from distances import ann
+from distances import ann, calculate_distances
 import numpy as np
 import matplotlib.pyplot as plt
+import timeit
 
 
 # -----------------------------------------------------------------------------------------------------------
@@ -10,6 +11,7 @@ import matplotlib.pyplot as plt
 
 
 def evaluate_meshes(excel_file):
+    start = timeit.default_timer()
     total_acc, total_prec, total_recc = 0, 0, 0
     acc_prec_recc_cat_list = []
     df = pd.read_excel(excel_file, index_col=0)
@@ -18,7 +20,13 @@ def evaluate_meshes(excel_file):
         category = file.split("/")[1]
         if file == "LabeledDB_new/Hand/subs_183.off":
             continue
-        distances = ann(df, file, 15, 20)
+        distances = ann(df, file, 40, 20)
+
+        # values = df.loc[(df['path'] == file)].values[0][1:]
+        # distances = calculate_distances(values, df)
+        # distances.sort(key=lambda tup: tup[0])
+        # distances = distances[:20]
+
         categories = [tup[1].split("/")[1] for tup in distances]
         y_pred = [1 if cat == category else 0 for cat in categories]
         TP = y_pred.count(1)
@@ -32,6 +40,7 @@ def evaluate_meshes(excel_file):
         total_prec += prec
         total_recc += rec
         acc_prec_recc_cat_list.append((acc, prec, rec, category))
+    stop = timeit.default_timer()
     print(
         f"Airplane accuracy, precision, recall: {sum([e[0] for e in acc_prec_recc_cat_list if e[3] == 'Airplane']) / 20}, {sum([e[1] for e in acc_prec_recc_cat_list if e[3] == 'Airplane']) / 20}, {sum([e[2] for e in acc_prec_recc_cat_list if e[3] == 'Airplane']) / 20}")
     print(
@@ -75,6 +84,8 @@ def evaluate_meshes(excel_file):
     print(f"Total precision: {total_prec / 380}")
     print(f"Total recall: {total_recc / 380}")
 
+    print('Time: ', stop - start)
+
     return acc_prec_recc_cat_list
 
 
@@ -113,4 +124,4 @@ def histograms(results_list):
 
 # MAIN
 # evaluate_meshes("normalized.xlsx")
-# histograms(evaluate_meshes("normalized.xlsx"))
+histograms(evaluate_meshes("normalized.xlsx"))
