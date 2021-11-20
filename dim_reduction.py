@@ -25,7 +25,12 @@ def plot_tsne():
 
     df_numeric = df.drop(columns=['num', 'path', 'class'])
 
-    m = TSNE(learning_rate=50)
+    m = TSNE(perplexity=30, learning_rate=50, n_iter=1000)
+    # We tested different values for the parameters of TSNE:
+    # Perplexity 20, 30 or 40?              (default is 30)
+    # Learning rate 50, 100, 150, or 200    (default is 200)
+    # Iterations 500, 1000 or 1500?         (default is 1000)
+
     tsne_features = m.fit_transform(df_numeric)
 
     df['x'] = tsne_features[:,0]

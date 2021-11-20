@@ -25,7 +25,6 @@ def save_ouput(fold):
     output = []
     i = 0
     vertice_nums = []
-    category_nums = []
     faces_nums = []
     norm_dist = []
     long_boundbox = []
@@ -64,7 +63,6 @@ def save_ouput(fold):
 
                 # Append the necessary info to variables for histograms
                 vertice_nums.append(int(num_vert))
-                category_nums.append(str(dir))
                 faces_nums.append(int(num_faces))
                 norm_dist.append(dist)
                 long_boundbox.append(round(float(max(mesh.bounding_box.extents)), 5))
@@ -125,24 +123,56 @@ def diameter2(mesh):
     return diam
 
 
+def plot_category_distribution():
+    df = pd.read_excel("descriptors.xlsx")
+    categories = df["shape_class"].tolist()
+    # Distribution of amount of meshes in each class
+    plt.hist(categories, rwidth=0.95, bins=19)
+    plt.xticks(rotation=90)
+    plt.title('Distribution of meshes over the different classes')
+    plt.ylabel('amount of meshes')
+    plt.xlabel('category')
+    plt.show()
+
+
 def distance_two_point(p1, p2):
     squared_dist = np.sum((p1 - p2) ** 2, axis=0)
     return np.sqrt(squared_dist)
 
 
-def norm_plots(dist_list, bound_list):
+def norm_position_plots():
+    fold = 'LabeledDB_new'
+    dist_before = []
+    dist_after = []
+
+
+    for dir in tqdm(os.listdir(fold)):
+        for filename in glob.iglob(f'{fold}/{dir}/*.off'):
+            mesh = trimesh.load(filename, force='mesh')
+            p1 = np.array([mesh.center_mass[0], mesh.center_mass[1], mesh.center_mass[2]])
+            p2 = np.array([0, 0, 0])
+            dist = distance_two_point(p1, p2)
+            dist_before.append(dist)
+
+            mesh, eigenvectors, eigenvalues = normalization_tool(mesh)
+            p1 = np.array([mesh.center_mass[0], mesh.center_mass[1], mesh.center_mass[2]])
+            p2 = np.array([0, 0, 0])
+            dist_new = distance_two_point(p1, p2)
+            dist_after.append(dist_new)
+
+
     # Distribution of amount of vertices before preprocessing
-    plt.hist(dist_list, rwidth=0.95, bins=15)
-    plt.title('Distribution of distances between barycenter of meshes and the world origin')
+    plt.hist(dist_before, rwidth=0.95, bins=15)
+    plt.title('Distances between barycenter of meshes and the world origin, before normalization')
     plt.ylabel('frequency')
     plt.xlabel('distance to origin')
     plt.show()
 
-    # Distribution of amount of vertices before preprocessing
-    plt.hist(bound_list, rwidth=0.95, bins=15)
-    plt.title('Distribution of the longest size of the axis-aligned bounding box of the mesh ')
+    # Distribution of amount of vertices after preprocessing
+    plt.hist(dist_after, rwidth=0.95, bins=15)
+    plt.title('Distances between barycenter of meshes and the world origin, after normalization')
     plt.ylabel('frequency')
-    plt.xlabel('size of longest side of the bounding box')
+    plt.xlabel('distance to origin')
     plt.show()
 
 
@@ -221,3 +251,4 @@ def before_and_after_scale_images():
 
 # # uncomment the line below to save the excel file
 # save_excel(DIR, "descriptors.xlsx")
+norm_position_plots()

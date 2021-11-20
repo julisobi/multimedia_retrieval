@@ -87,7 +87,7 @@ def total_plots_new(descriptor: str):
 
 # MAIN
 # total_plots_new("a3")
-total_plots_new("d1")
+# total_plots_new("d1")
 # total_plots_new("d2")
 # total_plots_new("d3")
 # total_plots_new("d4")
